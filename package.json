@@ -1,0 +1,21 @@
+{
+  "name": "ts_module",
+  "version": "1.0.0",
+  "description": "example git submodule, typescript",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magocod/ts_module.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/magocod/ts_module/issues"
+  },
+  "homepage": "https://github.com/magocod/ts_module#readme",
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  }
+}
