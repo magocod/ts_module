@@ -1,4 +1,4 @@
-import { Store, Discount, ItemType } from "../lib/checkout";
+import { Store, Discount, ItemType } from "../src/checkout";
 
 describe('checkout test', () => {
 

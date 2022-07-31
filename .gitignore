@@ -1,5 +1,13 @@
-node_modules
+/node_modules
+/dist
+/tmp
+
 
 .idea
 
+.env
+
+# test coverage
+.nyc_output
 coverage
+test/coverage

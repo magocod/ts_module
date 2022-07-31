@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "example git submodule, typescript",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:coverage": "jest --coverage"

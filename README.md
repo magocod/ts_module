@@ -1,2 +1,9 @@
 # ts_module
-example git submodule, typescript
+
+practice
+
+* git submodule
+* typescript lib
+* web assembly with rust
+
+
