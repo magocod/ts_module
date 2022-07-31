@@ -2,7 +2,9 @@ import { GlobalConfig } from "@jest/types/build/Config";
 import { ProjectConfigTsJest } from "ts-jest";
 
 export default async function setup(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   globalConfig: GlobalConfig,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   projectConfig: ProjectConfigTsJest
 ) {
   // console.log(globalConfig);

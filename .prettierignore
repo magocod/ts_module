@@ -1,0 +1,12 @@
+coverage
+.nyc_output
+tmp
+dist
+.github
+README.md
+CODE_OF_CONDUCT.md
+package.json
+package-lock.json
+.mocharc.yml
+tsconfig.json
+tsconfig.build.json

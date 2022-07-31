@@ -4,20 +4,20 @@ import { C } from "./C";
 import { D } from "./D";
 
 export interface Item {
-    getPrice(): number;
+  getPrice(): number;
 }
 
 export function itemFactory(itemChar: string): Item {
-    if (itemChar === ItemType.D) return new D();
-    if (itemChar === ItemType.C) return new C();
-    if (itemChar === ItemType.B) return new B();
-    if (itemChar === ItemType.A) return new A();
-    throw new Error("Unknown Item");
+  if (itemChar === ItemType.D) return new D();
+  if (itemChar === ItemType.C) return new C();
+  if (itemChar === ItemType.B) return new B();
+  if (itemChar === ItemType.A) return new A();
+  throw new Error("Unknown Item");
 }
 
 export enum ItemType {
-    A = "A",
-    B = "B",
-    C = "C",
-    D = "D"
+  A = "A",
+  B = "B",
+  C = "C",
+  D = "D",
 }
