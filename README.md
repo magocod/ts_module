@@ -14,3 +14,53 @@ practice
 * web assembly with rust
 
 
+## Project setup
+
+### Compile rust code to javascript (packages)
+
+Move to packages and compile rust projects
+```bash
+cd packages/practice
+```
+run
+```bash
+wasm-pack build --target nodejs
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Translate code to javascript (dist)
+
+```bash
+npm run build
+```
+
+### Run tests
+
+```bash
+npm run test
+npm run test:watch
+
+npm run test:coverage
+```
+
+## Code style
+
+### Eslint
+
+```bash
+npm run lint
+```
+
+### Prettier
+
+```bash
+npm run format:check
+npm run format
+```
+
+
