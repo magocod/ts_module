@@ -21,6 +21,9 @@
     "url": "https://github.com/magocod/ts_module/issues"
   },
   "homepage": "https://github.com/magocod/ts_module#readme",
+  "dependencies": {
+    "practice_wasm": "./packages/practice/pkg"
+  },
   "devDependencies": {
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
