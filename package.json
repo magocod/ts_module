@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/magocod/ts_module#readme",
   "dependencies": {
-    "practice_wasm": "./packages/practice/pkg"
+    "practice_wasm": "./crates/practice/pkg"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
