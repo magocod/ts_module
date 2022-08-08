@@ -22,17 +22,20 @@
   },
   "homepage": "https://github.com/magocod/ts_module#readme",
   "dependencies": {
-    "practice_wasm": "./crates/practice/pkg"
+    "@dinero.js/currencies": "^2.0.0-alpha.8",
+    "dinero.js": "^2.0.0-alpha.8",
+    "practice_wasm": "./crates/practice/pkg",
+    "crate_cpu_count": "./crates/cpu-count"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^28.1.6",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
-    "jest": "^27.5.1",
+    "jest": "^28.1.3",
     "prettier": "2.6.1",
-    "ts-jest": "^27.1.4",
+    "ts-jest": "^28.0.7",
     "ts-node": "^10.7.0",
     "typescript": "^4.5.5"
   }

@@ -1,9 +1,9 @@
-import { GlobalConfig } from "@jest/types/build/Config";
+// import { GlobalConfig } from "@jest/types/build/Config";
 import { ProjectConfigTsJest } from "ts-jest";
 
 export default async function teardown(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  globalConfig: GlobalConfig,
+  globalConfig: unknown,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   projectConfig: ProjectConfigTsJest
 ) {
