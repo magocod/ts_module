@@ -1,19 +1,29 @@
 import cpuCount from "crate_cpu_count";
 
 describe("neon", function () {
-    const pcCpu = 6; // local pc
+  const pcCpu = 6; // local pc
 
-    it("hello", function ()  {
-        const h = cpuCount.hello();
-        // console.log(h);
+  const bookValue = {
+    author: "B",
+    title: "A",
+    year: 2009,
+  };
 
-        expect(h).toBe("hello node");
-    });
+  it("hello", function () {
+    const h = cpuCount.hello();
+    // console.log(h);
 
-    it("console log from rust", function ()  {
-        const count = cpuCount.get();
-        // console.log(count);
+    expect(h).toBe("hello node");
+  });
 
-        expect(count).toBe(pcCpu);
-    });
+  it("console log from rust", function () {
+    const count = cpuCount.get();
+    // console.log(count);
+
+    expect(count).toBe(pcCpu);
+  });
+
+  it("neon object", function () {
+      expect(cpuCount.book).toEqual(bookValue);
+  });
 });
