@@ -2,7 +2,6 @@
 /dist
 /tmp
 
-
 .idea
 
 .env
@@ -11,3 +10,6 @@
 .nyc_output
 coverage
 test/coverage
+
+# rust
+/target

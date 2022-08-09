@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "crates/add_one",
+    "crates/awesome",
+    "crates/cpu-count",
+    "crates/practice",
+]
