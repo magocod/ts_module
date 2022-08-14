@@ -25,7 +25,8 @@
     "@dinero.js/currencies": "^2.0.0-alpha.8",
     "dinero.js": "^2.0.0-alpha.8",
     "practice_wasm": "./crates/practice/pkg",
-    "crate_cpu_count": "./crates/cpu-count"
+    "crate_cpu_count": "./crates/cpu-count",
+    "crate_awesome": "./crates/awesome"
   },
   "devDependencies": {
     "@types/jest": "^28.1.6",
