@@ -236,6 +236,9 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { sum } = nativeBinding
+const { AnimalWithDefaultConstructor, QueryEngine, sum, minus } = nativeBinding
 
+module.exports.AnimalWithDefaultConstructor = AnimalWithDefaultConstructor
+module.exports.QueryEngine = QueryEngine
 module.exports.sum = sum
+module.exports.minus = minus
