@@ -5,4 +5,5 @@ members = [
     "crates/awesome",
     "crates/cpu-count",
     "crates/practice",
+    "crates/adder",
 ]
