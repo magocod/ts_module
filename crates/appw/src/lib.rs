@@ -1,13 +1,15 @@
 use actix_web::{get, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 
+pub mod auth;
 pub mod error;
 
-const APP_MESSAGE: &str = "Hello rust actix!";
+pub const APP_MESSAGE: &str = "Hello rust actix!";
+pub const PUBLIC_ROUTES: [&str; 2] = ["/", "/public"];
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MyObj {
-    name: String,
+    pub name: String,
 }
 
 #[get("/")]
