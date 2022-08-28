@@ -2,7 +2,7 @@ use actix_cors::Cors;
 use actix_web::{dev::ServiceRequest, get, App, Error, HttpResponse, HttpServer, web};
 use actix_web_httpauth::{extractors::bearer::BearerAuth, middleware::HttpAuthentication};
 
-use appw::{MyObj};
+use appw::hello::{MyObj};
 use appw::auth;
 
 async fn ok_validator(
