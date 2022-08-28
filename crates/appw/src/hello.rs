@@ -16,6 +16,16 @@ pub async fn hello_server() -> impl Responder {
     })
 }
 
+#[get("/public_route")]
+pub async fn public_route() -> HttpResponse {
+    HttpResponse::Ok().json(MyObj { name: "public route".to_string() })
+}
+
+#[get("/auth_route")]
+pub async fn auth_route() -> HttpResponse {
+    HttpResponse::Ok().json(MyObj { name: "auth route".to_string() })
+}
+
 #[cfg(test)]
 mod tests {
     // use std::assert_matches::assert_matches;

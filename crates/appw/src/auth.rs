@@ -5,8 +5,8 @@ use crate::error::ServiceError;
 
 use argon2::{self, Config};
 
-const SECRET_KEY: &str = "secret";
-const SALT: &[u8] = b"supersecuresalt";
+pub const SECRET_KEY: &str = "secret";
+pub const SALT: &[u8] = b"supersecuresalt";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AuthData {

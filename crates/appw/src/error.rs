@@ -1,4 +1,9 @@
-use actix_web::{error::ResponseError, HttpResponse};
+use actix_web::{
+    error::ResponseError,
+    HttpResponse,
+    // Error as ActixError
+};
+use jsonwebtoken::errors::{Error as ErrorJwt};
 use derive_more::Display;
 
 #[derive(Debug, Display)]
@@ -29,3 +34,42 @@ impl ResponseError for ServiceError {
         }
     }
 }
+
+// impl From<Example> for ServiceError {
+//     fn from(_: Example) -> ServiceError {
+//         ServiceError::BadRequest("error".into())
+//     }
+// }
+
+impl From<ErrorJwt> for ServiceError {
+    fn from(_v: ErrorJwt) -> ServiceError {
+        // match v.kind() {
+        //     ErrorKind::InvalidToken => {}
+        //     ErrorKind::InvalidSignature => {}
+        //     ErrorKind::InvalidEcdsaKey => {}
+        //     ErrorKind::InvalidRsaKey(_) => {}
+        //     ErrorKind::RsaFailedSigning => {}
+        //     ErrorKind::InvalidAlgorithmName => {}
+        //     ErrorKind::InvalidKeyFormat => {}
+        //     ErrorKind::MissingRequiredClaim(_) => {}
+        //     ErrorKind::ExpiredSignature => {}
+        //     ErrorKind::InvalidIssuer => {}
+        //     ErrorKind::InvalidAudience => {}
+        //     ErrorKind::InvalidSubject => {}
+        //     ErrorKind::ImmatureSignature => {}
+        //     ErrorKind::InvalidAlgorithm => {}
+        //     ErrorKind::MissingAlgorithm => {}
+        //     ErrorKind::Base64(_) => {}
+        //     ErrorKind::Json(_) => {}
+        //     ErrorKind::Utf8(_) => {}
+        //     ErrorKind::Crypto(_) => {}
+        // }
+        ServiceError::BadRequest("error jwt".into())
+    }
+}
+
+// impl From<ActixError> for ServiceError {
+//     fn from(_v: ActixError) -> ServiceError {
+//         ServiceError::BadRequest("error".into())
+//     }
+// }
