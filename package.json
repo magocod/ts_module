@@ -23,10 +23,12 @@
   "homepage": "https://github.com/magocod/ts_module#readme",
   "dependencies": {
     "@dinero.js/currencies": "^2.0.0-alpha.8",
-    "dinero.js": "^2.0.0-alpha.8",
-    "practice_wasm": "./crates/practice/pkg",
+    "crate_awesome": "./crates/awesome",
     "crate_cpu_count": "./crates/cpu-count",
-    "crate_awesome": "./crates/awesome"
+    "dinero.js": "^2.0.0-alpha.8",
+    "moment": "^2.29.4",
+    "practice_wasm": "./crates/practice/pkg",
+    "@crates/calculator-napi": "./crates/calculator-napi"
   },
   "devDependencies": {
     "@types/jest": "^28.1.6",

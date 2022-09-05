@@ -7,4 +7,5 @@ members = [
     "crates/practice",
     "crates/adder",
     "crates/appw",
+    "crates/calculator-napi"
 ]
