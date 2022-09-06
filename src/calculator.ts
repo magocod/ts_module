@@ -19,7 +19,9 @@ import {
     zero,
 } from '@crates/calculator-napi';
 
-export const calculator = {
+import * as dinBigInt from "@dinero.js/calculator-bigint"
+
+const calculatorNapi = {
     add,
     compare,
     decrement,
@@ -34,9 +36,17 @@ export const calculator = {
 };
 
 export const dineroNapi = createDinero({
-    calculator,
+    calculator: calculatorNapi,
     onCreate({ amount, scale }) {
         assert(Number.isInteger(amount), INVALID_AMOUNT_MESSAGE);
         assert(Number.isInteger(scale), INVALID_SCALE_MESSAGE);
+    },
+});
+
+export const dineroBigint = createDinero({
+    calculator: dinBigInt.calculator,
+    onCreate({ amount, scale }) {
+        // assert(Number.isInteger(amount), INVALID_AMOUNT_MESSAGE);
+        // assert(Number.isInteger(scale), INVALID_SCALE_MESSAGE);
     },
 });
