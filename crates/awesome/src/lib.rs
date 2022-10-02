@@ -2,10 +2,10 @@
 
 use napi::bindgen_prelude::*;
 
-pub mod class_example;
-
 #[macro_use]
 extern crate napi_derive;
+
+pub mod class_example;
 
 #[napi]
 fn sum(a: i32, b: i32) -> i32 {
