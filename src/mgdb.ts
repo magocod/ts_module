@@ -28,7 +28,6 @@ export interface MongoCollection<T = InferredSchema> {
 
 function getType<T = unknown>(ob: unknown) {
   const obType = typeof ob;
-  console.log(ob, obType);
 
   if (["string", "number", "boolean"].includes(obType)) {
     return obType;
@@ -38,8 +37,8 @@ function getType<T = unknown>(ob: unknown) {
     if (Array.isArray(ob)) {
       return ob.map((e) => {
         const typeE = typeof e;
-        console.log("map", e, typeE)
-        if (["string", "number", "boolean"].includes(typeof typeE)) {
+
+        if (["string", "number", "boolean"].includes(typeE)) {
           return typeE;
         }
 
@@ -51,6 +50,8 @@ function getType<T = unknown>(ob: unknown) {
           if (moment(e as string, "YYYY-MM-DD").isValid()) {
             return "Date";
           }
+
+          return getObjectSchema<T>(e as ObjectSchema<T>);
         }
 
         return "unknown";
@@ -71,7 +72,7 @@ function getType<T = unknown>(ob: unknown) {
   return "unknown";
 }
 
-function getObjectSchema<T = InferredSchema>(doc: ObjectSchema) {
+function getObjectSchema<T = InferredSchema>(doc: ObjectSchema<T>) {
   const schema: ObjectSchema = {};
   for (const key in doc) {
     schema[key] = getType(doc[key]);
