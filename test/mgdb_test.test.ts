@@ -1,8 +1,8 @@
 import {
-  explore,
+  exploreDb,
   insertExampleDocs,
   generateClient,
-  dbName,
+  dbName, exploreSchema,
 } from "../src/mgdb";
 import { MongoClient } from "mongodb";
 
@@ -19,15 +19,16 @@ describe("mgdb", function () {
   });
 
   it("explore", async function () {
-    const v = await explore();
-    console.log(JSON.stringify(v, null, 2));
+    const v = await exploreDb();
+    // console.log(JSON.stringify(v, null, 2));
+    exploreSchema(v)
 
     expect(v).toBeInstanceOf(Array);
   });
 
-  // it("insertExampleDocs", async function () {
-  //   await insertExampleDocs(client.db(dbName));
-  //
-  //   expect(1).toEqual(1);
-  // });
+  it("insertExampleDocs", async function () {
+    await insertExampleDocs(client.db(dbName));
+
+    expect(1).toEqual(1);
+  });
 });

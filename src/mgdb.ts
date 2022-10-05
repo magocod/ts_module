@@ -1,7 +1,14 @@
 import { promises as fsPromise } from "fs";
-import { MongoClient, Db, ObjectId, InsertOneResult } from "mongodb";
+import {
+  MongoClient,
+  Db,
+  ObjectId,
+  InsertOneResult,
+  Collection,
+} from "mongodb";
 import { faker } from "@faker-js/faker";
 import moment from "moment";
+import pluralize from "pluralize";
 
 // Connection URL
 const url =
@@ -15,6 +22,10 @@ export function generateClient(): MongoClient {
 
 export const client = generateClient();
 
+export enum MongoTypes {
+  ObjectId = "ObjectId",
+}
+
 export interface ObjectSchema<T = unknown> {
   [key: string]: T;
 }
@@ -26,7 +37,11 @@ export interface MongoCollection<T = InferredSchema> {
   schema: ObjectSchema<T>;
 }
 
-function getType<T = unknown>(ob: unknown) {
+function getType<T = unknown>(
+  ob: unknown,
+  key: string,
+  collections: Collection[]
+) {
   const obType = typeof ob;
 
   if (["string", "number", "boolean"].includes(obType)) {
@@ -35,7 +50,7 @@ function getType<T = unknown>(ob: unknown) {
 
   if (obType === "object") {
     if (Array.isArray(ob)) {
-      return ob.map((e) => {
+      return ob.slice(0, 1).map((e) => {
         const typeE = typeof e;
 
         if (["string", "number", "boolean"].includes(typeE)) {
@@ -44,14 +59,14 @@ function getType<T = unknown>(ob: unknown) {
 
         if (typeE === "object") {
           if (ObjectId.isValid(e as string)) {
-            return "ObjectId";
+            return exploreObjectId(key, collections);
           }
 
           if (moment(e as string, "YYYY-MM-DD").isValid()) {
             return "Date";
           }
 
-          return getObjectSchema<T>(e as ObjectSchema<T>);
+          return getObjectSchema<T>(e as ObjectSchema<T>, collections);
         }
 
         return "unknown";
@@ -59,29 +74,64 @@ function getType<T = unknown>(ob: unknown) {
     }
 
     if (ObjectId.isValid(ob as string)) {
-      return "ObjectId";
+      return exploreObjectId(key, collections);
     }
 
     if (moment(ob as string, "YYYY-MM-DD").isValid()) {
       return "Date";
     }
 
-    return getObjectSchema<T>(ob as ObjectSchema<T>);
+    return getObjectSchema<T>(ob as ObjectSchema<T>, collections);
   }
 
   return "unknown";
 }
 
-function getObjectSchema<T = InferredSchema>(doc: ObjectSchema<T>) {
+function exploreObjectId(key: string, collections: Collection[]) {
+  if (key === "_id") {
+    return MongoTypes.ObjectId;
+  }
+
+  if (pluralize.isSingular(key)) {
+    const col = collections.find((c) => {
+      return c.collectionName === pluralize.plural(key);
+    });
+
+    if (col === undefined) {
+      return MongoTypes.ObjectId;
+    }
+
+    return `${MongoTypes.ObjectId}:${col.collectionName}`;
+  }
+
+  if (pluralize.isPlural(key)) {
+    const col = collections.find((c) => {
+      return c.collectionName === key;
+    });
+
+    if (col === undefined) {
+      return MongoTypes.ObjectId;
+    }
+
+    return `${MongoTypes.ObjectId}:${col.collectionName}`;
+  }
+
+  return MongoTypes.ObjectId;
+}
+
+function getObjectSchema<T = InferredSchema>(
+  doc: ObjectSchema<T>,
+  collections: Collection[]
+) {
   const schema: ObjectSchema = {};
   for (const key in doc) {
-    schema[key] = getType(doc[key]);
+    schema[key] = getType(doc[key], key, collections);
   }
 
   return schema as ObjectSchema<T>;
 }
 
-export async function explore() {
+export async function exploreDb() {
   const mongoCollections: MongoCollection[] = [];
 
   try {
@@ -99,7 +149,7 @@ export async function explore() {
       };
 
       for (const doc of findResult) {
-        col.schema = getObjectSchema(doc);
+        col.schema = getObjectSchema(doc, collections);
       }
 
       mongoCollections.push(col);
@@ -119,6 +169,45 @@ export async function explore() {
   return mongoCollections;
 }
 
+export function exploreSchema(collections: MongoCollection[]) {
+  for (const col of collections) {
+    showKeys(col.schema);
+  }
+}
+
+export function showKeys(schema: ObjectSchema) {
+  for (const key in schema) {
+    const value = schema[key];
+    console.log(key);
+
+    if (value === null || value === undefined) {
+      continue;
+    }
+
+    if (typeof value === "object") {
+      if (Array.isArray(value)) {
+        for (const sub of value.slice(0, 1)) {
+
+          if (ObjectId.isValid(sub) || moment(sub, "YYYY-MM-DD").isValid()) {
+            continue;
+          }
+
+          showKeys(sub);
+        }
+      }
+
+      if (
+        ObjectId.isValid(value as ObjectId) ||
+        moment(value as Date, "YYYY-MM-DD").isValid()
+      ) {
+        continue;
+      }
+
+      showKeys(value as ObjectSchema);
+    }
+  }
+}
+
 export interface Country {
   name: string;
   code: number;
@@ -130,6 +219,12 @@ export interface Book {
   preview: {
     content: string;
   };
+  chapters: ObjectId[];
+}
+
+export interface Chapter {
+  title: string;
+  isActive: boolean;
 }
 
 export interface User {
@@ -171,6 +266,16 @@ export async function insertExampleDocs(db: Db) {
     throw new Error("countryCol.findOne");
   }
 
+  const chapterCol = db.collection<Chapter>("chapters");
+  insertOneResult = await chapterCol.insertOne({
+    title: faker.animal.insect(),
+    isActive: faker.datatype.boolean(),
+  });
+  const chapter = await chapterCol.findOne({ _id: insertOneResult.insertedId });
+  if (chapter === null) {
+    throw new Error("chapterCol.findOne");
+  }
+
   const bookCol = db.collection<Book>("books");
   insertOneResult = await bookCol.insertOne({
     title: faker.animal.cat(),
@@ -178,6 +283,7 @@ export async function insertExampleDocs(db: Db) {
     preview: {
       content: faker.animal.fish(),
     },
+    chapters: [chapter._id],
   });
   const book = await bookCol.findOne({ _id: insertOneResult.insertedId });
   if (book === null) {
@@ -216,6 +322,7 @@ export async function insertExampleDocs(db: Db) {
           title: book.title,
           author: book.author,
           preview: book.preview,
+          chapters: book.chapters,
         },
         book: book._id,
         tags: faker.helpers.arrayElements(["a", "b", "c", "d"]),

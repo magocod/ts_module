@@ -32,11 +32,13 @@
     "dinero.js": "^2.0.0-alpha.8",
     "moment": "^2.29.4",
     "mongodb": "^4.10.0",
+    "pluralize": "^8.0.0",
     "practice_wasm": "./crates/practice/pkg",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/jest": "^28.1.6",
+    "@types/pluralize": "^0.0.29",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "eslint": "^8.20.0",
