@@ -38,6 +38,18 @@ pub async fn connect() -> Result<Client, Box<dyn Error>> {
     Ok(client)
 }
 
+pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
+    for key in document.keys() {
+        println!("{}", key);
+        match document.get(key) {
+            None => {}
+            Some(v) => {
+                get_type(key.to_string(), v, schema);
+            }
+        }
+    }
+}
+
 pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option<bool> {
     match value {
         Value::Null => {
@@ -69,86 +81,42 @@ pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option
     Some(true)
 }
 
-pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
-    for key in document.keys() {
-        println!("{}", key);
-        match document.get(key) {
-            None => {}
-            Some(v) => {
-                match v {
-                    Value::Null => {
-                        println!("null {}", v);
-                        schema.insert(key.to_string(), Value::String("null".to_string()));
-                    }
-                    Value::Bool(_) => {
-                        println!("bool {}", v);
-                        schema.insert(key.to_string(), Value::String("bool".to_string()));
-                    }
-                    Value::Number(_) => {
-                        println!("number {}", v);
-                        schema.insert(key.to_string(), Value::String("number".to_string()));
-                    }
-                    Value::String(_) => {
-                        println!("string {}", v);
-                        schema.insert(key.to_string(), Value::String("string".to_string()));
-                    }
-                    Value::Array(arr) => {
-                        println!("array {:#?}", v);
-                        match arr.first() {
-                            None => {
-                                // pass
-                            }
-                            Some(_) => {}
-                        }
-                    }
-                    Value::Object(ob) => {
-                        println!("object {:?}", ob);
-                        let m = get_map_schema(ob, schema);
-                        schema.insert(key.to_string(), Value::Object(m));
-                        // schema.insert(key.to_string(), v);
-                        // schema.insert(key.to_string(), "object".to_string());
-                    }
-                }
-            }
-        }
-    }
-}
-
-pub fn get_map_schema(document: &Map<String, Value>, schema: &mut GenericDocument) -> Map<String, Value> {
+pub fn get_map_schema(
+    document: &Map<String, Value>,
+    schema: &mut GenericDocument,
+) -> GenericDocument {
     let mut temp_map = Map::new();
     for key in document.keys() {
         println!("{}", key);
         match document.get(key) {
             None => {}
-            Some(v) => {
-                match v {
-                    Value::Null => {
-                        println!("null {}", v);
-                        temp_map.insert(key.to_string(), Value::String("null".to_string()));
-                    }
-                    Value::Bool(_) => {
-                        println!("bool {}", v);
-                        temp_map.insert(key.to_string(), Value::String("bool".to_string()));
-                    }
-                    Value::Number(_) => {
-                        println!("number {}", v);
-                        temp_map.insert(key.to_string(), Value::String("number".to_string()));
-                    }
-                    Value::String(_) => {
-                        println!("string {}", v);
-                        temp_map.insert(key.to_string(), Value::String("string".to_string()));
-                    }
-                    Value::Array(arr) => {
-                        println!("array {:#?}", arr);
-                        temp_map.insert(key.to_string(), Value::String("array".to_string()));
-                    }
-                    Value::Object(ob) => {
-                        println!("object {:?}", ob);
-                        let m = get_map_schema(ob, schema);
-                        schema.insert(key.to_string(), Value::Object(m));
-                    }
+            Some(v) => match v {
+                Value::Null => {
+                    println!("null {}", v);
+                    temp_map.insert(key.to_string(), Value::String("null".to_string()));
                 }
-            }
+                Value::Bool(_) => {
+                    println!("bool {}", v);
+                    temp_map.insert(key.to_string(), Value::String("bool".to_string()));
+                }
+                Value::Number(_) => {
+                    println!("number {}", v);
+                    temp_map.insert(key.to_string(), Value::String("number".to_string()));
+                }
+                Value::String(_) => {
+                    println!("string {}", v);
+                    temp_map.insert(key.to_string(), Value::String("string".to_string()));
+                }
+                Value::Array(arr) => {
+                    println!("array {:#?}", arr);
+                    temp_map.insert(key.to_string(), Value::String("array".to_string()));
+                }
+                Value::Object(ob) => {
+                    println!("object {:?}", ob);
+                    let m = get_map_schema(ob, schema);
+                    schema.insert(key.to_string(), Value::Object(m));
+                }
+            },
         }
     }
     temp_map
