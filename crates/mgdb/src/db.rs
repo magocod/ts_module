@@ -38,6 +38,37 @@ pub async fn connect() -> Result<Client, Box<dyn Error>> {
     Ok(client)
 }
 
+pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option<bool> {
+    match value {
+        Value::Null => {
+            println!("null {}", value);
+            map.insert(key, Value::String("null".to_string()));
+        }
+        Value::Bool(_) => {
+            println!("bool {}", value);
+            map.insert(key, Value::String("bool".to_string()));
+        }
+        Value::Number(_) => {
+            println!("number {}", value);
+            map.insert(key.to_string(), Value::String("number".to_string()));
+        }
+        Value::String(_) => {
+            println!("string {}", value);
+            map.insert(key.to_string(), Value::String("string".to_string()));
+        }
+        Value::Array(arr) => {
+            println!("array {:#?}", arr);
+            map.insert(key.to_string(), Value::String("array".to_string()));
+        }
+        Value::Object(ob) => {
+            println!("object {:?}", ob);
+            let m = get_map_schema(ob, map);
+            map.insert(key.to_string(), Value::Object(m));
+        }
+    }
+    Some(true)
+}
+
 pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
     for key in document.keys() {
         println!("{}", key);
@@ -65,7 +96,7 @@ pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
                         println!("array {:#?}", v);
                         match arr.first() {
                             None => {
-                                schema.insert(key.to_string(), Value::);
+                                // pass
                             }
                             Some(_) => {}
                         }
