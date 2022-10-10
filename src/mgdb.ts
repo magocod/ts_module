@@ -175,7 +175,21 @@ export function exploreSchema(collections: MongoCollection[]) {
   }
 }
 
-export function showKeys(schema: ObjectSchema) {
+export function showKeys(schema: ObjectSchema | string | unknown[]): void {
+  console.log("showKeys", schema);
+
+  if (typeof schema === "string") {
+    console.log(schema);
+    return;
+  }
+
+  if (Array.isArray(schema)) {
+    for (const v of schema) {
+      showKeys(v as ObjectSchema | string);
+    }
+    return;
+  }
+
   for (const key in schema) {
     const value = schema[key];
     console.log(key);
@@ -186,8 +200,7 @@ export function showKeys(schema: ObjectSchema) {
 
     if (typeof value === "object") {
       if (Array.isArray(value)) {
-        for (const sub of value.slice(0, 1)) {
-
+        for (const sub of value) {
           if (ObjectId.isValid(sub) || moment(sub, "YYYY-MM-DD").isValid()) {
             continue;
           }

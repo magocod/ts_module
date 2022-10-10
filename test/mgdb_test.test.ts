@@ -21,7 +21,7 @@ describe("mgdb", function () {
   it("explore", async function () {
     const v = await exploreDb();
     // console.log(JSON.stringify(v, null, 2));
-    exploreSchema(v)
+    // exploreSchema(v)
 
     expect(v).toBeInstanceOf(Array);
   });
