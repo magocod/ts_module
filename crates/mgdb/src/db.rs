@@ -50,7 +50,8 @@ pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
     }
 }
 
-pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option<bool> {
+pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) {
+    // let mut typeName: String = String::new();
     match value {
         Value::Null => {
             println!("null {}", value);
@@ -70,7 +71,15 @@ pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option
         }
         Value::Array(arr) => {
             println!("array {:#?}", arr);
-            map.insert(key.to_string(), Value::String("array".to_string()));
+            match arr.first() {
+                None => {}
+                Some(val) => {
+                    let mut temp_map = Map::new();
+                    get_type("array".to_string(), val, &mut temp_map);
+                    map.insert(key.to_string(), Value::Object(temp_map));
+                }
+            }
+            // map.insert(key.to_string(), Value::String("array".to_string()));
         }
         Value::Object(ob) => {
             println!("object {:?}", ob);
@@ -78,7 +87,6 @@ pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option
             map.insert(key.to_string(), Value::Object(m));
         }
     }
-    Some(true)
 }
 
 pub fn get_map_schema(
@@ -109,12 +117,20 @@ pub fn get_map_schema(
                 }
                 Value::Array(arr) => {
                     println!("array {:#?}", arr);
-                    temp_map.insert(key.to_string(), Value::String("array".to_string()));
+                    match arr.first() {
+                        None => {}
+                        Some(val) => {
+                            let mut sub_map = Map::new();
+                            get_type("array".to_string(), val, &mut sub_map);
+                            temp_map.insert(key.to_string(), Value::Object(sub_map));
+                        }
+                    }
+                    // temp_map.insert(key.to_string(), Value::String("array".to_string()));
                 }
                 Value::Object(ob) => {
                     println!("object {:?}", ob);
                     let m = get_map_schema(ob, schema);
-                    schema.insert(key.to_string(), Value::Object(m));
+                    temp_map.insert(key.to_string(), Value::Object(m));
                 }
             },
         }
