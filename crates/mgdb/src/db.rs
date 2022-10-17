@@ -4,6 +4,7 @@ use std::error::Error;
 use futures::stream::TryStreamExt;
 // use mongodb::bson::oid::ObjectId;
 use mongodb::options::FindOptions;
+use pluralizer::pluralize;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
@@ -38,19 +39,29 @@ pub async fn connect() -> Result<Client, Box<dyn Error>> {
     Ok(client)
 }
 
-pub fn get_schema(document: GenericDocument, schema: &mut GenericDocument) {
+pub fn get_schema(
+    document: GenericDocument,
+    schema: &mut GenericDocument,
+    collection_names: &Vec<String>,
+) {
     for key in document.keys() {
         println!("{}", key);
         match document.get(key) {
             None => {}
             Some(v) => {
-                get_type(key.to_string(), v, schema);
+                get_type(key.to_string(), v, schema, collection_names);
             }
         }
     }
 }
 
-pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option<bool> {
+pub fn get_type(
+    key: String,
+    value: &Value,
+    map: &mut GenericDocument,
+    collection_names: &Vec<String>,
+) {
+    // let mut typeName: String = String::new();
     match value {
         Value::Null => {
             println!("null {}", value);
@@ -70,20 +81,45 @@ pub fn get_type(key: String, value: &Value, map: &mut GenericDocument) -> Option
         }
         Value::Array(arr) => {
             println!("array {:#?}", arr);
-            map.insert(key.to_string(), Value::String("array".to_string()));
+            match arr.first() {
+                None => {}
+                Some(val) => {
+                    let mut temp_map = Map::new();
+                    // get_type("array".to_string(), val, &mut temp_map);
+                    get_type(key.to_string(), val, &mut temp_map, collection_names);
+                    map.insert(key.to_string(), Value::Object(temp_map));
+                }
+            }
+            // map.insert(key.to_string(), Value::String("array".to_string()));
         }
         Value::Object(ob) => {
             println!("object {:?}", ob);
-            let m = get_map_schema(ob, map);
-            map.insert(key.to_string(), Value::Object(m));
+            match ob.get("$oid") {
+                None => {
+                    let m = get_map_schema(ob, map, collection_names);
+                    map.insert(key.to_string(), Value::Object(m));
+                }
+                Some(_) => {
+                    let mut temp_map = Map::new();
+                    temp_map.insert("$oid".to_string(), Value::String("string".to_string()));
+                    if key != "_id" {
+                        let plural_key = pluralize(key.as_str(), 2, false);
+                        println!("pluralize {} -> {}", key, plural_key);
+                        if collection_names.contains(&plural_key) {
+                            temp_map.insert("$collection".to_string(), Value::String(plural_key));
+                        }
+                    }
+                    map.insert(key.to_string(), Value::Object(temp_map));
+                }
+            }
         }
     }
-    Some(true)
 }
 
 pub fn get_map_schema(
     document: &Map<String, Value>,
     schema: &mut GenericDocument,
+    collection_names: &Vec<String>,
 ) -> GenericDocument {
     let mut temp_map = Map::new();
     for key in document.keys() {
@@ -109,12 +145,38 @@ pub fn get_map_schema(
                 }
                 Value::Array(arr) => {
                     println!("array {:#?}", arr);
-                    temp_map.insert(key.to_string(), Value::String("array".to_string()));
+                    match arr.first() {
+                        None => {}
+                        Some(val) => {
+                            let mut sub_map = Map::new();
+                            // get_type("array".to_string(), val, &mut sub_map);
+                            get_type(key.to_string(), val, &mut sub_map, collection_names);
+                            temp_map.insert(key.to_string(), Value::Object(sub_map));
+                        }
+                    }
+                    // temp_map.insert(key.to_string(), Value::String("array".to_string()));
                 }
                 Value::Object(ob) => {
                     println!("object {:?}", ob);
-                    let m = get_map_schema(ob, schema);
-                    schema.insert(key.to_string(), Value::Object(m));
+
+                    match ob.get("$oid") {
+                        None => {
+                            let m = get_map_schema(ob, schema, collection_names);
+                            temp_map.insert(key.to_string(), Value::Object(m));
+                        }
+                        Some(_) => {
+                            let mut sub_map = Map::new();
+                            sub_map.insert("$oid".to_string(), Value::String("string".to_string()));
+                            if key != "_id" {
+                                let plural_key = pluralize(key.as_str(), 2, false);
+                                println!("pluralize {} -> {}", key, plural_key);
+                                if collection_names.contains(&plural_key) {
+                                    sub_map.insert("$collection".to_string(), Value::String(plural_key));
+                                }
+                            }
+                            temp_map.insert(key.to_string(), Value::Object(sub_map));
+                        }
+                    }
                 }
             },
         }
@@ -136,7 +198,7 @@ pub async fn explore() -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn 
     let mut collection_map: Vec<MongoCollection<GenericDocument>> = vec![];
 
     // List the names of the collections in that database.
-    for collection_name in collection_names {
+    for collection_name in collection_names.clone() {
         // println!("collection: {}", collection_name);
 
         let collection = db.collection::<GenericDocument>(collection_name.as_str());
@@ -153,7 +215,7 @@ pub async fn explore() -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn 
         // Iterate over the results of the cursor.
         while let Some(document) = cursor.try_next().await? {
             // println!("document: {:#?}", document);
-            get_schema(document, &mut col.schema);
+            get_schema(document, &mut col.schema, &collection_names);
         }
 
         collection_map.push(col);
