@@ -13,3 +13,4 @@ serde_json = "1.0"
 fake = "2.4"
 rand = "0.8"
 tokio = { version = "1", features = ["full"] }
+pluralizer = "0.3.2"

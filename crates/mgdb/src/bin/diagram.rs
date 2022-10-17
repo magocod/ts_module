@@ -1,8 +1,11 @@
 use mgdb::db::explore;
 use std::fs;
+use pluralizer;
 
 #[tokio::main]
 async fn main() {
+    pluralizer::initialize();
+
     let v = explore().await.expect("explore failed");
     println!("v: {:#?}", v);
 
