@@ -1,4 +1,5 @@
 pub mod db;
+pub mod populate_v1;
 
 #[cfg(test)]
 mod tests {
