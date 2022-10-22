@@ -14,7 +14,7 @@ export function generateClient(): MongoClient {
 }
 
 export enum MongoTypes {
-  ObjectId = "ObjectId"
+  ObjectId = "ObjectId",
 }
 
 export interface ObjectSchema<T = unknown> {
