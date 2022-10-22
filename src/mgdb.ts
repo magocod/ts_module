@@ -14,7 +14,7 @@ import pluralize from "pluralize";
 const url =
   "mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
 
-export const dbName = "actix";
+export const dbName = "dbv0";
 
 export function generateClient(): MongoClient {
   return new MongoClient(url);
@@ -270,79 +270,56 @@ export interface Profile {
 
 export async function insertExampleDocs(db: Db) {
   const countryCol = db.collection<Country>("countries");
-  let insertOneResult: InsertOneResult = await countryCol.insertOne({
+  const resultCountry: InsertOneResult = await countryCol.insertOne({
     name: faker.address.country(),
     code: faker.datatype.number({ min: -100, max: 100 }),
   });
-  const country = await countryCol.findOne({ _id: insertOneResult.insertedId });
-  if (country === null) {
-    throw new Error("countryCol.findOne");
-  }
 
   const chapterCol = db.collection<Chapter>("chapters");
-  insertOneResult = await chapterCol.insertOne({
+  const resultChapter = await chapterCol.insertOne({
     title: faker.animal.insect(),
     isActive: faker.datatype.boolean(),
   });
-  const chapter = await chapterCol.findOne({ _id: insertOneResult.insertedId });
-  if (chapter === null) {
-    throw new Error("chapterCol.findOne");
-  }
 
   const bookCol = db.collection<Book>("books");
-  insertOneResult = await bookCol.insertOne({
+  const bookData = {
     title: faker.animal.cat(),
     author: faker.name.fullName(),
     preview: {
       content: faker.animal.fish(),
     },
-    chapters: [chapter._id],
-  });
-  const book = await bookCol.findOne({ _id: insertOneResult.insertedId });
-  if (book === null) {
-    throw new Error("bookCol.findOne");
-  }
+    chapters: [resultChapter.insertedId],
+  };
+  const resultBook = await bookCol.insertOne(bookData);
 
   const userCol = db.collection<User>("users");
-  insertOneResult = await userCol.insertOne({
+  const resultUser = await userCol.insertOne({
     name: faker.name.fullName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
     roles: faker.helpers.arrayElements([0, 1, 2, 3]),
     date: new Date(),
   });
-  const user = await userCol.findOne({ _id: insertOneResult.insertedId });
-  if (user === null) {
-    throw new Error("userCol.findOne");
-  }
 
   const tokenCol = db.collection<Token>("tokens");
   await tokenCol.insertOne({
     token: faker.datatype.uuid(),
-    user: user._id,
+    user: resultUser.insertedId,
     date: new Date(),
   });
 
-  const publicationCol = db.collection<Profile>("profiles");
-  insertOneResult = await publicationCol.insertOne({
-    user: user._id,
-    country: country._id,
-    books: [book._id],
+  const profileCol = db.collection<Profile>("profiles");
+  await profileCol.insertOne({
+    user: resultUser.insertedId,
+    country: resultCountry.insertedId,
+    books: [resultBook.insertedId],
     publications: [
       {
         date: new Date(),
-        bookData: {
-          title: book.title,
-          author: book.author,
-          preview: book.preview,
-          chapters: book.chapters,
-        },
-        book: book._id,
+        bookData,
+        book: resultBook.insertedId,
         tags: faker.helpers.arrayElements(["a", "b", "c", "d"]),
       },
     ],
-  });
-  await publicationCol.findOne({
-    _id: insertOneResult.insertedId,
   });
 }
