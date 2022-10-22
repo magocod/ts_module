@@ -23,12 +23,12 @@ struct Chapter {
     is_active: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Preview {
     content: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Book {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
@@ -104,23 +104,20 @@ pub async fn seed() -> Result<(), Box<dyn Error>> {
 
     let book_collection = db.collection::<Book>("books");
 
-    let book_id = book_collection
-        .insert_one(
-            Book {
-                id: None,
-                title: Industry(EN).fake(),
-                author: Name(EN).fake(),
-                preview: Preview {
-                    content: Word(EN).fake(),
-                },
-                chapters: vec![chapter_id
-                    .inserted_id
-                    .as_object_id()
-                    .expect("error as_object_id")],
-            },
-            None,
-        )
-        .await?;
+    let book_data = Book {
+        id: None,
+        title: Industry(EN).fake(),
+        author: Name(EN).fake(),
+        preview: Preview {
+            content: Word(EN).fake(),
+        },
+        chapters: vec![chapter_id
+            .inserted_id
+            .as_object_id()
+            .expect("error as_object_id")],
+    };
+
+    let book_id = book_collection.insert_one(book_data.clone(), None).await?;
 
     let country_collection = db.collection::<Country>("countries");
 
@@ -144,7 +141,10 @@ pub async fn seed() -> Result<(), Box<dyn Error>> {
                 name: Industry(EN).fake(),
                 email: SafeEmail(EN).fake(),
                 password: Password(EN, 5..10).fake(),
-                roles: vec![rand::thread_rng().gen_range(0..100)],
+                roles: vec![
+                    rand::thread_rng().gen_range(0..100),
+                    rand::thread_rng().gen_range(0..100),
+                ],
                 date: DateTime::now(),
             },
             None,
@@ -163,6 +163,39 @@ pub async fn seed() -> Result<(), Box<dyn Error>> {
                     .as_object_id()
                     .expect("error as_object_id"),
                 date: DateTime::now(),
+            },
+            None,
+        )
+        .await?;
+
+    let profile_collection = db.collection::<Profile>("profiles");
+
+    profile_collection
+        .insert_one(
+            Profile {
+                id: None,
+                user: user_id
+                    .inserted_id
+                    .as_object_id()
+                    .expect("error as_object_id"),
+                country: country_id
+                    .inserted_id
+                    .as_object_id()
+                    .expect("error as_object_id"),
+                books: vec![book_id
+                    .inserted_id
+                    .as_object_id()
+                    .expect("error as_object_id")],
+                publications: vec![Publication {
+                    id: None,
+                    date: DateTime::now(),
+                    book_data,
+                    book: book_id
+                        .inserted_id
+                        .as_object_id()
+                        .expect("error as_object_id"),
+                    tags: vec![Word(EN).fake(), Word(EN).fake()],
+                }],
             },
             None,
         )
