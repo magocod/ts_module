@@ -1,9 +1,5 @@
-import {
-  exploreDb,
-  insertExampleDocs,
-  generateClient,
-  dbName, exploreSchema,
-} from "../src/mgdb";
+import { exploreDb, generateClient, dbName } from "../src/mgdb";
+import { seed } from "../src/populate_v0";
 import { MongoClient } from "mongodb";
 
 describe("mgdb", function () {
@@ -19,15 +15,15 @@ describe("mgdb", function () {
   });
 
   it("explore", async function () {
-    const v = await exploreDb();
+    const v = await exploreDb(client.db(dbName));
     // console.log(JSON.stringify(v, null, 2));
     // exploreSchema(v)
 
     expect(v).toBeInstanceOf(Array);
   });
 
-  it("insertExampleDocs", async function () {
-    await insertExampleDocs(client.db(dbName));
+  it("populate_v0_seed", async function () {
+    await seed(client.db(dbName));
 
     expect(1).toEqual(1);
   });

@@ -1,12 +1,5 @@
 import { promises as fsPromise } from "fs";
-import {
-  MongoClient,
-  Db,
-  ObjectId,
-  InsertOneResult,
-  Collection,
-} from "mongodb";
-import { faker } from "@faker-js/faker";
+import { MongoClient, Db, ObjectId, Collection } from "mongodb";
 import moment from "moment";
 import pluralize from "pluralize";
 
@@ -20,10 +13,8 @@ export function generateClient(): MongoClient {
   return new MongoClient(url);
 }
 
-export const client = generateClient();
-
 export enum MongoTypes {
-  ObjectId = "ObjectId",
+  ObjectId = "ObjectId"
 }
 
 export interface ObjectSchema<T = unknown> {
@@ -37,10 +28,16 @@ export interface MongoCollection<T = InferredSchema> {
   schema: ObjectSchema<T>;
 }
 
+type FinderRelationships = (
+  key: string,
+  collections: Collection[]
+) => MongoTypes.ObjectId | string;
+
 function getType<T = unknown>(
   ob: unknown,
   key: string,
-  collections: Collection[]
+  collections: Collection[],
+  finderRelationships: FinderRelationships
 ) {
   const obType = typeof ob;
 
@@ -59,14 +56,18 @@ function getType<T = unknown>(
 
         if (typeE === "object") {
           if (ObjectId.isValid(e as string)) {
-            return exploreObjectId(key, collections);
+            return finderRelationships(key, collections);
           }
 
           if (moment(e as string, "YYYY-MM-DD").isValid()) {
             return "Date";
           }
 
-          return getObjectSchema<T>(e as ObjectSchema<T>, collections);
+          return getObjectSchema<T>(
+            e as ObjectSchema<T>,
+            collections,
+            finderRelationships
+          );
         }
 
         return "unknown";
@@ -74,14 +75,18 @@ function getType<T = unknown>(
     }
 
     if (ObjectId.isValid(ob as string)) {
-      return exploreObjectId(key, collections);
+      return finderRelationships(key, collections);
     }
 
     if (moment(ob as string, "YYYY-MM-DD").isValid()) {
       return "Date";
     }
 
-    return getObjectSchema<T>(ob as ObjectSchema<T>, collections);
+    return getObjectSchema<T>(
+      ob as ObjectSchema<T>,
+      collections,
+      finderRelationships
+    );
   }
 
   return "unknown";
@@ -121,50 +126,48 @@ function exploreObjectId(key: string, collections: Collection[]) {
 
 function getObjectSchema<T = InferredSchema>(
   doc: ObjectSchema<T>,
-  collections: Collection[]
+  collections: Collection[],
+  finderRelationships: FinderRelationships
 ) {
   const schema: ObjectSchema = {};
   for (const key in doc) {
-    schema[key] = getType(doc[key], key, collections);
+    schema[key] = getType(doc[key], key, collections, finderRelationships);
   }
 
   return schema as ObjectSchema<T>;
 }
 
-export async function exploreDb() {
+export async function exploreDb(
+  db: Db,
+  finderRelationships: FinderRelationships = exploreObjectId,
+  saveFile = true
+) {
   const mongoCollections: MongoCollection[] = [];
+  const collections = await db.collections();
 
-  try {
-    await client.connect();
-    const db = client.db(dbName);
-    const collections = await db.collections();
+  for (const collection of collections) {
+    const findResult = await collection.find({}).limit(1).toArray();
+    // console.log("Found documents =>", findResult);
 
-    for (const collection of collections) {
-      const findResult = await collection.find({}).limit(1).toArray();
-      // console.log("Found documents =>", findResult);
+    const col: MongoCollection = {
+      name: collection.collectionName,
+      schema: {},
+    };
 
-      const col: MongoCollection = {
-        name: collection.collectionName,
-        schema: {},
-      };
-
-      for (const doc of findResult) {
-        col.schema = getObjectSchema(doc, collections);
-      }
-
-      mongoCollections.push(col);
+    for (const doc of findResult) {
+      col.schema = getObjectSchema(doc, collections, finderRelationships);
     }
-  } catch (e) {
-    console.log(e);
-  } finally {
-    await client.close();
+
+    mongoCollections.push(col);
   }
 
   // other
-  await fsPromise.writeFile(
-    "./tmp/ts.json",
-    JSON.stringify(mongoCollections, null, 2)
-  );
+  if (saveFile) {
+    await fsPromise.writeFile(
+      "./tmp/ts.json",
+      JSON.stringify(mongoCollections, null, 2)
+    );
+  }
 
   return mongoCollections;
 }
@@ -219,107 +222,4 @@ export function showKeys(schema: ObjectSchema | string | unknown[]): void {
       showKeys(value as ObjectSchema);
     }
   }
-}
-
-export interface Country {
-  name: string;
-  code: number;
-}
-
-export interface Book {
-  title: string;
-  author: string;
-  preview: {
-    content: string;
-  };
-  chapters: ObjectId[];
-}
-
-export interface Chapter {
-  title: string;
-  isActive: boolean;
-}
-
-export interface User {
-  name: string;
-  email: string;
-  password: string;
-  roles: number[];
-  date: Date;
-}
-
-export interface Token {
-  token: string;
-  user: ObjectId;
-  date: Date;
-}
-
-export interface Publication {
-  date: Date;
-  bookData: Book;
-  book: ObjectId;
-  tags: string[];
-}
-
-export interface Profile {
-  user: ObjectId;
-  country: ObjectId;
-  books: ObjectId[];
-  publications: Publication[];
-}
-
-export async function insertExampleDocs(db: Db) {
-  const countryCol = db.collection<Country>("countries");
-  const resultCountry: InsertOneResult = await countryCol.insertOne({
-    name: faker.address.country(),
-    code: faker.datatype.number({ min: -100, max: 100 }),
-  });
-
-  const chapterCol = db.collection<Chapter>("chapters");
-  const resultChapter = await chapterCol.insertOne({
-    title: faker.animal.insect(),
-    isActive: faker.datatype.boolean(),
-  });
-
-  const bookCol = db.collection<Book>("books");
-  const bookData = {
-    title: faker.animal.cat(),
-    author: faker.name.fullName(),
-    preview: {
-      content: faker.animal.fish(),
-    },
-    chapters: [resultChapter.insertedId],
-  };
-  const resultBook = await bookCol.insertOne(bookData);
-
-  const userCol = db.collection<User>("users");
-  const resultUser = await userCol.insertOne({
-    name: faker.name.fullName(),
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-    roles: faker.helpers.arrayElements([0, 1, 2, 3]),
-    date: new Date(),
-  });
-
-  const tokenCol = db.collection<Token>("tokens");
-  await tokenCol.insertOne({
-    token: faker.datatype.uuid(),
-    user: resultUser.insertedId,
-    date: new Date(),
-  });
-
-  const profileCol = db.collection<Profile>("profiles");
-  await profileCol.insertOne({
-    user: resultUser.insertedId,
-    country: resultCountry.insertedId,
-    books: [resultBook.insertedId],
-    publications: [
-      {
-        date: new Date(),
-        bookData,
-        book: resultBook.insertedId,
-        tags: faker.helpers.arrayElements(["a", "b", "c", "d"]),
-      },
-    ],
-  });
 }
