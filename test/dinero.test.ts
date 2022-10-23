@@ -1,7 +1,14 @@
 import { USD } from "@dinero.js/currencies";
-import { allocate, Dinero, dinero, toUnit, add, greaterThanOrEqual } from "dinero.js";
+import {
+  allocate,
+  Dinero,
+  dinero,
+  toUnit,
+  add,
+  greaterThanOrEqual,
+} from "dinero.js";
 
-import { dineroBigint, dineroNapi } from "../src/calculator"
+import { dineroBigint, dineroNapi } from "../src/calculator";
 
 function createUSD(amount: number): Dinero<number> {
   return dinero({ amount, currency: USD });
@@ -103,40 +110,41 @@ describe("dinero", () => {
     });
   });
 
-  describe("big amounts", function () {
-    const a1 = 25800000000000000;
-    const a2 = 25900000000000000;
-
-    it("js, number", function () {
-      console.log(Number.isSafeInteger(a1))
-      console.log(Number.isSafeInteger(a2))
-
-      const d1 = dinero({ amount: a1, currency: USD });
-      const d2 = dinero({ amount: a2, currency: USD });
-
-      const d = greaterThanOrEqual(d1, d2)
-      console.log(d)
-
-      const d1n = dineroNapi({ amount: a1, currency: USD })
-      const d2n = dineroNapi({ amount: a2, currency: USD })
-
-      const dn = greaterThanOrEqual(d1n, d2n)
-      console.log(dn)
-    });
-
-    it("js, bigInt", function () {
-      const USDBigInt = {
-        code: "USD",
-        base: 10n,
-        exponent: 2n,
-      };
-
-      const d1 = dineroBigint({ amount: BigInt(a1), currency: USDBigInt });
-      const d2 = dineroBigint({ amount: BigInt(a2), currency: USDBigInt });
-      console.log(d1.toJSON(), d2.toJSON())
-
-      const d = greaterThanOrEqual(d1, d2)
-      console.log(d)
-    });
-  });
+  // describe("big amounts", function () {
+  //   const a1 = 25800000000000000;
+  //   const a2 = 25900000000000000;
+  //
+  //   it("js, number", function () {
+  //     // console.log(Number.isSafeInteger(a1))
+  //     // console.log(Number.isSafeInteger(a2))
+  //
+  //     const d1 = dinero({ amount: a1, currency: USD });
+  //     const d2 = dinero({ amount: a2, currency: USD });
+  //
+  //     const d = greaterThanOrEqual(d1, d2)
+  //     // console.log(d)
+  //
+  //     const d1n = dineroNapi({ amount: a1, currency: USD })
+  //     const d2n = dineroNapi({ amount: a2, currency: USD })
+  //
+  //     const dn = greaterThanOrEqual(d1n, d2n)
+  //     // console.log(dn)
+  //     expect(1).toEqual(1);
+  //   });
+  //
+  //   it("js, bigInt", function () {
+  //     const USDBigInt = {
+  //       code: "USD",
+  //       base: 10n,
+  //       exponent: 2n,
+  //     };
+  //
+  //     const d1 = dineroBigint({ amount: BigInt(a1), currency: USDBigInt });
+  //     const d2 = dineroBigint({ amount: BigInt(a2), currency: USDBigInt });
+  //     console.log(d1.toJSON(), d2.toJSON())
+  //
+  //     const d = greaterThanOrEqual(d1, d2)
+  //     console.log(d)
+  //   });
+  // });
 });
