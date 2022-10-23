@@ -1,8 +1,8 @@
-use actix_web::{http, test, App, web};
-use actix_web_httpauth::{middleware::HttpAuthentication};
+use actix_web::{http, test, web, App};
+use actix_web_httpauth::middleware::HttpAuthentication;
 
-use appw::jwt::{ok_validator, generate_token};
 use appw::hello::{auth_route, MyObj};
+use appw::jwt::{generate_token, ok_validator};
 use appw::user::models::User;
 
 mod common;
@@ -11,11 +11,14 @@ mod common;
 
 #[actix_web::test]
 async fn successful_authentication() {
-    let app = test::init_service(App::new().service(
-        web::scope("/api")
-            .wrap(HttpAuthentication::bearer(ok_validator))
-            .service(auth_route)
-    )).await;
+    let app = test::init_service(
+        App::new().service(
+            web::scope("/api")
+                .wrap(HttpAuthentication::bearer(ok_validator))
+                .service(auth_route),
+        ),
+    )
+    .await;
 
     let tk = generate_token(&User::factory()).expect("error generate token");
 
@@ -29,17 +32,20 @@ async fn successful_authentication() {
     println!("{}, {:?}", resp.status(), resp.response().body());
     assert_eq!(resp.status(), http::StatusCode::OK);
 
-    let js: MyObj = test::read_body_json( resp).await;
+    let js: MyObj = test::read_body_json(resp).await;
     println!("{:?}", js);
 }
 
 #[actix_web::test]
 async fn no_authentication_header() {
-    let app = test::init_service(App::new().service(
-        web::scope("/api")
-            .wrap(HttpAuthentication::bearer(ok_validator))
-            .service(auth_route)
-    )).await;
+    let app = test::init_service(
+        App::new().service(
+            web::scope("/api")
+                .wrap(HttpAuthentication::bearer(ok_validator))
+                .service(auth_route),
+        ),
+    )
+    .await;
 
     let req = test::TestRequest::get().uri("/api/auth_route").to_request();
 

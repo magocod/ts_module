@@ -3,8 +3,8 @@ use actix_web::{
     HttpResponse,
     // Error as ActixError
 };
-use jsonwebtoken::errors::{Error as ErrorJwt};
 use derive_more::Display;
+use jsonwebtoken::errors::Error as ErrorJwt;
 
 #[derive(Debug, Display)]
 pub enum ServiceError {

@@ -12,7 +12,7 @@ fn main() {
     let s = "Hello";
     let n1 = 42;
     let n2 = 42.68;
-    let b  = true;
+    let b = true;
     let mut v: Vec<String> = vec![];
 
     print_type_of(&s);

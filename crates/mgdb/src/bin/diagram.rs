@@ -1,6 +1,6 @@
 use mgdb::db::explore;
-use std::fs;
 use pluralizer;
+use std::fs;
 
 #[tokio::main]
 async fn main() {

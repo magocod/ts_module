@@ -17,7 +17,9 @@ pub fn add(a: f64, b: f64) -> f64 {
 }
 
 #[napi]
-pub fn subtract(a: i64, b: i64) -> i64 { a - b }
+pub fn subtract(a: i64, b: i64) -> i64 {
+  a - b
+}
 
 #[napi]
 pub fn compare(a: i64, b: i64) -> i64 {
@@ -31,7 +33,7 @@ pub fn compare(a: i64, b: i64) -> i64 {
 }
 
 #[napi]
-pub fn decrement (value: i64) -> i64 {
+pub fn decrement(value: i64) -> i64 {
   value - 1
 }
 

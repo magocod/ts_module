@@ -18,19 +18,23 @@ pub async fn hello_server() -> impl Responder {
 
 #[get("/public_route")]
 pub async fn public_route() -> HttpResponse {
-    HttpResponse::Ok().json(MyObj { name: "public route".to_string() })
+    HttpResponse::Ok().json(MyObj {
+        name: "public route".to_string(),
+    })
 }
 
 #[get("/auth_route")]
 pub async fn auth_route() -> HttpResponse {
-    HttpResponse::Ok().json(MyObj { name: "auth route".to_string() })
+    HttpResponse::Ok().json(MyObj {
+        name: "auth route".to_string(),
+    })
 }
 
 #[cfg(test)]
 mod tests {
     // use std::assert_matches::assert_matches;
     use super::*;
-    use actix_web::{test, App, http};
+    use actix_web::{http, test, App};
 
     #[actix_web::test]
     async fn return_json_content() {
@@ -41,7 +45,7 @@ mod tests {
         let resp = test::call_service(&app, req).await;
         // let js: MyObj = test::call_and_read_body_json(&app, req_json).await;
         let status = resp.status();
-        let js: MyObj = test::read_body_json( resp).await;
+        let js: MyObj = test::read_body_json(resp).await;
 
         // println!("{}", status);
         // println!("{:?}", js);

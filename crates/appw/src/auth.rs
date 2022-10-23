@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse};
+use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
 
 use crate::error::ServiceError;
