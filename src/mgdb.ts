@@ -18,7 +18,7 @@ export interface MongoCollection<T = InferredSchema> {
   schema: ObjectSchema<T>;
 }
 
-type FinderRelationships = (
+export type FinderRelationships = (
   key: string,
   collections: Collection[]
 ) => MongoTypes.ObjectId | string;
@@ -82,7 +82,7 @@ function getType<T = unknown>(
   return "unknown";
 }
 
-function exploreObjectId(key: string, collections: Collection[]) {
+export function exploreObjectId(key: string, collections: Collection[]) {
   if (key === "_id") {
     return MongoTypes.ObjectId;
   }
@@ -130,7 +130,7 @@ function getObjectSchema<T = InferredSchema>(
 export async function exploreDb(
   db: Db,
   finderRelationships: FinderRelationships = exploreObjectId,
-  saveFile = true
+  saveFile = false
 ) {
   const mongoCollections: MongoCollection[] = [];
   const collections = await db.collections();
@@ -162,54 +162,54 @@ export async function exploreDb(
   return mongoCollections;
 }
 
-export function exploreSchema(collections: MongoCollection[]) {
-  for (const col of collections) {
-    showKeys(col.schema);
-  }
-}
-
-export function showKeys(schema: ObjectSchema | string | unknown[]): void {
-  console.log("showKeys", schema);
-
-  if (typeof schema === "string") {
-    console.log(schema);
-    return;
-  }
-
-  if (Array.isArray(schema)) {
-    for (const v of schema) {
-      showKeys(v as ObjectSchema | string);
-    }
-    return;
-  }
-
-  for (const key in schema) {
-    const value = schema[key];
-    console.log(key);
-
-    if (value === null || value === undefined) {
-      continue;
-    }
-
-    if (typeof value === "object") {
-      if (Array.isArray(value)) {
-        for (const sub of value) {
-          if (ObjectId.isValid(sub) || moment(sub, "YYYY-MM-DD").isValid()) {
-            continue;
-          }
-
-          showKeys(sub);
-        }
-      }
-
-      if (
-        ObjectId.isValid(value as ObjectId) ||
-        moment(value as Date, "YYYY-MM-DD").isValid()
-      ) {
-        continue;
-      }
-
-      showKeys(value as ObjectSchema);
-    }
-  }
-}
+// export function exploreSchema(collections: MongoCollection[]) {
+//   for (const col of collections) {
+//     showKeys(col.schema);
+//   }
+// }
+//
+// export function showKeys(schema: ObjectSchema | string | unknown[]): void {
+//   console.log("showKeys", schema);
+//
+//   if (typeof schema === "string") {
+//     console.log(schema);
+//     return;
+//   }
+//
+//   if (Array.isArray(schema)) {
+//     for (const v of schema) {
+//       showKeys(v as ObjectSchema | string);
+//     }
+//     return;
+//   }
+//
+//   for (const key in schema) {
+//     const value = schema[key];
+//     console.log(key);
+//
+//     if (value === null || value === undefined) {
+//       continue;
+//     }
+//
+//     if (typeof value === "object") {
+//       if (Array.isArray(value)) {
+//         for (const sub of value) {
+//           if (ObjectId.isValid(sub) || moment(sub, "YYYY-MM-DD").isValid()) {
+//             continue;
+//           }
+//
+//           showKeys(sub);
+//         }
+//       }
+//
+//       if (
+//         ObjectId.isValid(value as ObjectId) ||
+//         moment(value as Date, "YYYY-MM-DD").isValid()
+//       ) {
+//         continue;
+//       }
+//
+//       showKeys(value as ObjectSchema);
+//     }
+//   }
+// }
