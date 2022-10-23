@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[napi(constructor)]
 pub struct AnimalWithDefaultConstructor {
     pub name: String,

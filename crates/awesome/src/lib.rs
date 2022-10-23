@@ -1,4 +1,5 @@
 #![deny(clippy::all)]
+#![allow(dead_code)]
 
 use napi::bindgen_prelude::*;
 
