@@ -1,5 +1,29 @@
-import { Db, InsertOneResult, ObjectId } from "mongodb";
+import { Db, InsertOneResult, MongoClient, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
+
+// Connection URL
+const url =
+  "mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
+
+export function generateClient(): MongoClient {
+  return new MongoClient(url);
+}
+
+export enum DbNames {
+  dbv0 = "dbv0",
+  dbv1 = "dbv1",
+  dbv2 = "dbv2",
+  dbv3 = "dbv3",
+}
+
+export enum CollectionNames {
+  Countries = "countries",
+  Chapters = "chapters",
+  Books = "books",
+  Users = "users",
+  Tokens = "tokens",
+  Profiles = "profiles",
+}
 
 export interface Country {
   name: string;
@@ -49,19 +73,19 @@ export interface Profile {
 }
 
 export async function seed(db: Db) {
-  const countryCol = db.collection<Country>("countries");
+  const countryCol = db.collection<Country>(CollectionNames.Countries);
   const resultCountry: InsertOneResult = await countryCol.insertOne({
     name: faker.address.country(),
     code: faker.datatype.number({ min: -100, max: 100 }),
   });
 
-  const chapterCol = db.collection<Chapter>("chapters");
+  const chapterCol = db.collection<Chapter>(CollectionNames.Chapters);
   const resultChapter = await chapterCol.insertOne({
     title: faker.animal.insect(),
     isActive: faker.datatype.boolean(),
   });
 
-  const bookCol = db.collection<Book>("books");
+  const bookCol = db.collection<Book>(CollectionNames.Books);
   const bookData = {
     title: faker.animal.cat(),
     author: faker.name.fullName(),
@@ -72,7 +96,7 @@ export async function seed(db: Db) {
   };
   const resultBook = await bookCol.insertOne(bookData);
 
-  const userCol = db.collection<User>("users");
+  const userCol = db.collection<User>(CollectionNames.Users);
   const resultUser = await userCol.insertOne({
     name: faker.name.fullName(),
     email: faker.internet.email(),
@@ -81,14 +105,14 @@ export async function seed(db: Db) {
     date: new Date(),
   });
 
-  const tokenCol = db.collection<Token>("tokens");
+  const tokenCol = db.collection<Token>(CollectionNames.Tokens);
   await tokenCol.insertOne({
     token: faker.datatype.uuid(),
     user: resultUser.insertedId,
     date: new Date(),
   });
 
-  const profileCol = db.collection<Profile>("profiles");
+  const profileCol = db.collection<Profile>(CollectionNames.Profiles);
   await profileCol.insertOne({
     user: resultUser.insertedId,
     country: resultCountry.insertedId,

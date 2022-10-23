@@ -1,17 +1,7 @@
 import { promises as fsPromise } from "fs";
-import { MongoClient, Db, ObjectId, Collection } from "mongodb";
+import { Db, ObjectId, Collection } from "mongodb";
 import moment from "moment";
 import pluralize from "pluralize";
-
-// Connection URL
-const url =
-  "mongodb://127.0.0.1:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
-
-export const dbName = "dbv0";
-
-export function generateClient(): MongoClient {
-  return new MongoClient(url);
-}
 
 export enum MongoTypes {
   ObjectId = "ObjectId",
@@ -164,7 +154,7 @@ export async function exploreDb(
   // other
   if (saveFile) {
     await fsPromise.writeFile(
-      "./tmp/ts.json",
+      `./tmp/${db.databaseName}_ts.json`,
       JSON.stringify(mongoCollections, null, 2)
     );
   }
