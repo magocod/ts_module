@@ -1,4 +1,7 @@
 pub mod db;
+pub mod populate_v1;
+pub mod populate_v2;
+pub mod populate_v3;
 
 #[cfg(test)]
 mod tests {
