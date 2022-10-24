@@ -7,15 +7,7 @@ const config: Config.InitialOptions = {
   testEnvironment: "node",
   globalSetup: "./test/setup.ts",
   globalTeardown: "./test/teardown.ts",
-  testMatch: ["<rootDir>/test/unit/**/*.test.ts"],
+  testMatch: ["<rootDir>/test/wa/**/*.test.ts"],
   collectCoverageFrom: ["src/**/*.{ts,jxs}"],
 };
 export default config;
-
-// js
-// module.exports = {
-//   preset: "ts-jest",
-//   testEnvironment: "node",
-//   globalSetup: "./test/setup.js",
-//   globalTeardown: "./test/teardown.js",
-// };

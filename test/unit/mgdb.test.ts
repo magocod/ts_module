@@ -1,11 +1,11 @@
-import { exploreDb, MongoTypes } from "../src/mgdb";
-import { Explorer } from "../src/mgdbv2";
+import { exploreDb, MongoTypes } from "../../src/mgdb";
+import { Explorer } from "../../src/mgdbv2";
 import {
   seed,
   generateClient,
   DbNames,
   CollectionNames,
-} from "../src/populate_v0";
+} from "../../src/populate_v0";
 import { MongoClient } from "mongodb";
 import pluralize from "pluralize";
 
