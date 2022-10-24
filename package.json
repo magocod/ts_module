@@ -8,6 +8,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "build": "tsc",
+    "build:packages": "node build_packages.js",
     "test": "jest --config jest.config.ts",
     "test:watch": "jest --config jest.config.ts --watchAll",
     "test:coverage": "jest --config jest.config.ts --coverage",
@@ -51,9 +52,10 @@
   },
   "optionalDependencies": {
     "@crates/calculator-napi": "./crates/calculator-napi",
+    "@types/shelljs": "^0.8.11",
     "crate_awesome": "./crates/awesome",
     "crate_cpu_count": "./crates/cpu-count",
-    "shelljs": "^0.8.5",
-    "practice_wasm": "./crates/practice/pkg"
+    "practice_wasm": "./crates/practice/pkg",
+    "shelljs": "^0.8.5"
   }
 }
