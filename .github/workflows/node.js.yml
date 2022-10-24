@@ -72,7 +72,6 @@ jobs:
         with:
           crate: wasm-pack
           version: latest
-          use-tool-cache: true
       - uses: actions/cache@v3
         with:
           path: |
