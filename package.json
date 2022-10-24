@@ -11,9 +11,9 @@
     "test": "jest --config jest.config.ts",
     "test:watch": "jest --config jest.config.ts --watchAll",
     "test:coverage": "jest --config jest.config.ts --coverage",
-    "test:wa": "jest --config jest_wa.config.ts",
-    "test:wa:watch": "jest --config jest_wa.config.ts --watchAll",
-    "test:wa:coverage": "jest --config jest_wa.config.ts --coverage"
+    "test:wasm": "jest --config jest_wasm.config.ts",
+    "test:wasm:watch": "jest --config jest_wasm.config.ts --watchAll",
+    "test:wasm:coverage": "jest --config jest_wasm.config.ts --coverage"
   },
   "repository": {
     "type": "git",

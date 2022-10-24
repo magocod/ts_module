@@ -7,7 +7,7 @@ const config: Config.InitialOptions = {
   testEnvironment: "node",
   globalSetup: "./test/setup.ts",
   globalTeardown: "./test/teardown.ts",
-  testMatch: ["<rootDir>/test/wa/**/*.test.ts"],
+  testMatch: ["<rootDir>/test/wasm/**/*.test.ts"],
   collectCoverageFrom: ["src/**/*.{ts,jxs}"],
 };
 export default config;
