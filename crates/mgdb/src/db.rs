@@ -171,7 +171,10 @@ pub fn get_map_schema(
                                 let plural_key = pluralize(key.as_str(), 2, false);
                                 println!("pluralize {} -> {}", key, plural_key);
                                 if collection_names.contains(&plural_key) {
-                                    sub_map.insert("$collection".to_string(), Value::String(plural_key));
+                                    sub_map.insert(
+                                        "$collection".to_string(),
+                                        Value::String(plural_key),
+                                    );
                                 }
                             }
                             temp_map.insert(key.to_string(), Value::Object(sub_map));

@@ -5,10 +5,10 @@ import {
   dinero,
   toUnit,
   add,
-  greaterThanOrEqual,
+  // greaterThanOrEqual,
 } from "dinero.js";
 
-import { dineroBigint, dineroNapi } from "../src/calculator";
+// import { dineroBigint, dineroNapi } from "../../src/calculator";
 
 function createUSD(amount: number): Dinero<number> {
   return dinero({ amount, currency: USD });

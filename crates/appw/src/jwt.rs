@@ -6,11 +6,11 @@ use jsonwebtoken::{
 };
 
 use actix_web::{dev::ServiceRequest, Error as ActixError};
-use actix_web_httpauth::{extractors::bearer::BearerAuth};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 
-use crate::user::models::User;
 use crate::auth::SECRET_KEY;
 use crate::error::ServiceError;
+use crate::user::models::User;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -71,9 +71,7 @@ pub async fn ok_validator(
             // TODO check user
             Ok(req)
         }
-        Err(_e) => {
-            Err((ServiceError::Unauthorized.into(), req))
-        }
+        Err(_e) => Err((ServiceError::Unauthorized.into(), req)),
     }
 }
 

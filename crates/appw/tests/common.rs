@@ -1,4 +1,4 @@
-use actix_web::{http};
+use actix_web::http;
 use actix_web::http::header::HeaderName;
 
 #[allow(dead_code)]

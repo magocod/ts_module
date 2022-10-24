@@ -1,7 +1,7 @@
 use actix_web::{App, HttpServer};
 
-use appw::hello::hello_server;
 use appw::book::handler::book_scope;
+use appw::hello::hello_server;
 use appw::user::handler::user_scope;
 
 #[actix_web::main]
@@ -12,7 +12,7 @@ async fn main() -> std::io::Result<()> {
             .service(book_scope())
             .service(user_scope())
     })
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

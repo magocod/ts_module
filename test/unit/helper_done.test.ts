@@ -1,4 +1,4 @@
-import { createPartialDone, iteratePartialDone } from "./helpers";
+import { createPartialDone, iteratePartialDone } from "../helpers";
 
 import EventEmitter from "events";
 

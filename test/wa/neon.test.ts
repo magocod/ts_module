@@ -1,6 +1,5 @@
-import os from "os";
-
-import cpuCount from "crate_cpu_count";
+import * as os from "os";
+import * as cpuCount from "crate_cpu_count";
 
 describe("neon", function () {
   // const pcCpu = 6; // local pc

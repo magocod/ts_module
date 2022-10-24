@@ -8,7 +8,11 @@ async fn validator(
     credentials: BasicAuth,
 ) -> Result<ServiceRequest, (Error, ServiceRequest)> {
     println!("{:?}", credentials);
-    println!("username: {}, password: {:?}", credentials.user_id(), credentials.password());
+    println!(
+        "username: {}, password: {:?}",
+        credentials.user_id(),
+        credentials.password()
+    );
     Ok(req)
 }
 
@@ -21,8 +25,8 @@ async fn main() -> std::io::Result<()> {
             .wrap(auth)
             .service(web::resource("/").to(|| async { "Test\r\n" }))
     })
-        .bind("127.0.0.1:8080")?
-        // .workers(1)
-        .run()
-        .await
+    .bind("127.0.0.1:8080")?
+    // .workers(1)
+    .run()
+    .await
 }
