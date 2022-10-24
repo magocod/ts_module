@@ -52,6 +52,7 @@
   },
   "optionalDependencies": {
     "@crates/calculator-napi": "./crates/calculator-napi",
+    "@napi-rs/cli": "^2.12.0",
     "@types/shelljs": "^0.8.11",
     "crate_awesome": "./crates/awesome",
     "crate_cpu_count": "./crates/cpu-count",
