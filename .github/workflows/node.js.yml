@@ -68,10 +68,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/install@v0.1
-        with:
-          crate: wasm-pack
-          version: latest
       - uses: actions/cache@v3
         with:
           path: |
@@ -81,6 +77,10 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: wasm-pack
+          version: latest
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
