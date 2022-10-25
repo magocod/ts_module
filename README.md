@@ -12,20 +12,10 @@ practice
 * git submodule
 * typescript lib
 * web assembly with rust
+* node addons with rust (napi)
 
 
 ## Project setup
-
-### Compile rust code to javascript (packages)
-
-Move to packages and compile rust projects
-```bash
-cd packages/practice
-```
-run
-```bash
-wasm-pack build --target nodejs
-```
 
 ### Install dependencies
 
@@ -33,19 +23,54 @@ wasm-pack build --target nodejs
 npm install
 ```
 
-### Translate code to javascript (dist)
+### Build
+
+- typescript
 
 ```bash
 npm run build
 ```
 
+- rust
+
+```bash
+npm run build:packages
+```
+
 ### Run tests
+
+- typescript
 
 ```bash
 npm run test
-npm run test:watch
+```
 
+```bash
+npm run test:watch
+```
+
+```bash
 npm run test:coverage
+```
+
+- wasm
+
+```bash
+npm run test:wasm
+```
+
+```bash
+npm run test:wasm:watch
+```
+
+```bash
+npm run test:wasm:coverage
+```
+
+- rust
+
+```bash
+cargo test
 ```
 
 ## Code style
