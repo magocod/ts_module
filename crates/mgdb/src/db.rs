@@ -55,6 +55,34 @@ pub fn get_schema(
     }
 }
 
+pub fn explore_object_id(
+    key: String,
+    ob: &Map<String, Value>,
+    map: &mut Map<String, Value>,
+    collection_names: &Vec<String>,
+) -> Result<(), Box<dyn Error>> {
+    println!("object {:?}", ob);
+    match ob.get("$oid") {
+        None => {
+            let m = get_map_schema(ob, map, collection_names);
+            map.insert(key.to_string(), Value::Object(m));
+        }
+        Some(_) => {
+            let mut temp_map = Map::new();
+            temp_map.insert("$oid".to_string(), Value::String("string".to_string()));
+            if key != "_id" {
+                let plural_key = pluralize(key.as_str(), 2, false);
+                println!("pluralize {} -> {}", key, plural_key);
+                if collection_names.contains(&plural_key) {
+                    temp_map.insert("$collection".to_string(), Value::String(plural_key));
+                }
+            }
+            map.insert(key.to_string(), Value::Object(temp_map));
+        }
+    }
+    Ok(())
+}
+
 pub fn get_type(
     key: String,
     value: &Value,
@@ -187,14 +215,20 @@ pub fn get_map_schema(
     temp_map
 }
 
-pub async fn explore() -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn Error>> {
-    let client = connect().await?;
+pub async fn explore<'a>(
+    client: &Client,
+    name_db: &str,
+    // finder_relationships: Box<
+    //     dyn Fn(String, &Map<String, Value>, &mut Map<String, Value>, &Vec<String>) -> (),
+    // >,
+) -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn Error>> {
+    // let client = connect().await?;
     // for db_name in client.list_database_names(None, None).await? {
     //     println!("{}", db_name);
     // }
 
     // Get a handle to a database.
-    let db = client.database("actix");
+    let db = client.database(name_db);
 
     let collection_names = db.list_collection_names(None).await?;
 
@@ -230,10 +264,12 @@ pub async fn explore() -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::db_common::DBV1;
 
     #[tokio::test]
     async fn explore_db() {
-        let _ = explore().await.expect("fail explore");
+        let client = connect().await.expect("error connect mongodb");
+        let _ = explore(&client, DBV1).await.expect("fail explore");
         assert_eq!(1, 1);
     }
 }
