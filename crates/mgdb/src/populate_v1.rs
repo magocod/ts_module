@@ -1,4 +1,5 @@
 use crate::db::connect;
+use crate::db_common::DBV1;
 use fake::faker::address::raw::CountryName;
 use fake::faker::boolean::raw::Boolean;
 use fake::faker::company::raw::Industry;
@@ -87,7 +88,7 @@ struct Profile {
 
 pub async fn seed() -> Result<(), Box<dyn Error>> {
     let client = connect().await?;
-    let db = client.database("dbv1");
+    let db = client.database(DBV1);
 
     let chapter_collection = db.collection::<Chapter>("chapters");
 
