@@ -1,4 +1,4 @@
-use mgdb::db::{connect, explore};
+use mgdb::db::{connect, explore, explore_object_id};
 use mgdb::db_common::DBV1;
 use pluralizer;
 use std::fs;
@@ -8,7 +8,9 @@ async fn main() {
     pluralizer::initialize();
 
     let client = connect().await.expect("error connect mongodb");
-    let v = explore(&client, DBV1).await.expect("explore failed");
+    let v = explore(&client, DBV1, &explore_object_id)
+        .await
+        .expect("explore failed");
     println!("v: {:#?}", v);
 
     fs::write(

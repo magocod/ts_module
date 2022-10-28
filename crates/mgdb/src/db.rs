@@ -39,48 +39,43 @@ pub async fn connect() -> Result<Client, Box<dyn Error>> {
     Ok(client)
 }
 
+pub type FinderRelationships = dyn Fn(&str, &Vec<String>) -> Option<String>;
+
+pub fn explore_object_id(key: &str, collection_names: &Vec<String>) -> Option<String> {
+    // println!("{}", key);
+
+    if key != "_id" {
+        let plural_key = pluralize(key, 2, false);
+        // println!("pluralize {} -> {}", key, plural_key);
+        if collection_names.contains(&plural_key) {
+            return Some(plural_key);
+        }
+    }
+
+    None
+}
+
 pub fn get_schema(
     document: GenericDocument,
     schema: &mut GenericDocument,
     collection_names: &Vec<String>,
+    finder_relationships: &FinderRelationships,
 ) {
     for key in document.keys() {
-        println!("{}", key);
+        // println!("{}", key);
         match document.get(key) {
             None => {}
             Some(v) => {
-                get_type(key.to_string(), v, schema, collection_names);
+                get_type(
+                    key.to_string(),
+                    v,
+                    schema,
+                    collection_names,
+                    finder_relationships,
+                );
             }
         }
     }
-}
-
-pub fn explore_object_id(
-    key: String,
-    ob: &Map<String, Value>,
-    map: &mut Map<String, Value>,
-    collection_names: &Vec<String>,
-) -> Result<(), Box<dyn Error>> {
-    println!("object {:?}", ob);
-    match ob.get("$oid") {
-        None => {
-            let m = get_map_schema(ob, map, collection_names);
-            map.insert(key.to_string(), Value::Object(m));
-        }
-        Some(_) => {
-            let mut temp_map = Map::new();
-            temp_map.insert("$oid".to_string(), Value::String("string".to_string()));
-            if key != "_id" {
-                let plural_key = pluralize(key.as_str(), 2, false);
-                println!("pluralize {} -> {}", key, plural_key);
-                if collection_names.contains(&plural_key) {
-                    temp_map.insert("$collection".to_string(), Value::String(plural_key));
-                }
-            }
-            map.insert(key.to_string(), Value::Object(temp_map));
-        }
-    }
-    Ok(())
 }
 
 pub fn get_type(
@@ -88,54 +83,61 @@ pub fn get_type(
     value: &Value,
     map: &mut GenericDocument,
     collection_names: &Vec<String>,
+    finder_relationships: &FinderRelationships,
 ) {
     // let mut typeName: String = String::new();
     match value {
         Value::Null => {
-            println!("null {}", value);
+            // println!("null {}", value);
             map.insert(key, Value::String("null".to_string()));
         }
         Value::Bool(_) => {
-            println!("bool {}", value);
+            // println!("bool {}", value);
             map.insert(key, Value::String("bool".to_string()));
         }
         Value::Number(_) => {
-            println!("number {}", value);
+            // println!("number {}", value);
             map.insert(key.to_string(), Value::String("number".to_string()));
         }
         Value::String(_) => {
-            println!("string {}", value);
+            // println!("string {}", value);
             map.insert(key.to_string(), Value::String("string".to_string()));
         }
         Value::Array(arr) => {
-            println!("array {:#?}", arr);
+            // println!("array {:#?}", arr);
             match arr.first() {
                 None => {}
                 Some(val) => {
                     let mut temp_map = Map::new();
                     // get_type("array".to_string(), val, &mut temp_map);
-                    get_type(key.to_string(), val, &mut temp_map, collection_names);
+                    temp_map.insert("array".to_string(), Value::String("[]".to_string()));
+                    get_type(
+                        key.to_string(),
+                        val,
+                        &mut temp_map,
+                        collection_names,
+                        finder_relationships,
+                    );
                     map.insert(key.to_string(), Value::Object(temp_map));
                 }
             }
             // map.insert(key.to_string(), Value::String("array".to_string()));
         }
         Value::Object(ob) => {
-            println!("object {:?}", ob);
+            // println!("object {:?}", ob);
             match ob.get("$oid") {
                 None => {
-                    let m = get_map_schema(ob, map, collection_names);
+                    let m = get_map_schema(ob, map, collection_names, finder_relationships);
                     map.insert(key.to_string(), Value::Object(m));
                 }
                 Some(_) => {
                     let mut temp_map = Map::new();
                     temp_map.insert("$oid".to_string(), Value::String("string".to_string()));
-                    if key != "_id" {
-                        let plural_key = pluralize(key.as_str(), 2, false);
-                        println!("pluralize {} -> {}", key, plural_key);
-                        if collection_names.contains(&plural_key) {
-                            temp_map.insert("$collection".to_string(), Value::String(plural_key));
+                    match finder_relationships(key.as_str(), collection_names) {
+                        Some(val) => {
+                            temp_map.insert("collection".to_string(), Value::String(val));
                         }
+                        None => {}
                     }
                     map.insert(key.to_string(), Value::Object(temp_map));
                 }
@@ -148,62 +150,67 @@ pub fn get_map_schema(
     document: &Map<String, Value>,
     schema: &mut GenericDocument,
     collection_names: &Vec<String>,
+    finder_relationships: &FinderRelationships,
 ) -> GenericDocument {
     let mut temp_map = Map::new();
     for key in document.keys() {
-        println!("{}", key);
+        // println!("{}", key);
         match document.get(key) {
             None => {}
             Some(v) => match v {
                 Value::Null => {
-                    println!("null {}", v);
+                    // println!("null {}", v);
                     temp_map.insert(key.to_string(), Value::String("null".to_string()));
                 }
                 Value::Bool(_) => {
-                    println!("bool {}", v);
+                    // println!("bool {}", v);
                     temp_map.insert(key.to_string(), Value::String("bool".to_string()));
                 }
                 Value::Number(_) => {
-                    println!("number {}", v);
+                    // println!("number {}", v);
                     temp_map.insert(key.to_string(), Value::String("number".to_string()));
                 }
                 Value::String(_) => {
-                    println!("string {}", v);
+                    // println!("string {}", v);
                     temp_map.insert(key.to_string(), Value::String("string".to_string()));
                 }
                 Value::Array(arr) => {
-                    println!("array {:#?}", arr);
+                    // println!("array {:#?}", arr);
                     match arr.first() {
                         None => {}
                         Some(val) => {
                             let mut sub_map = Map::new();
                             // get_type("array".to_string(), val, &mut sub_map);
-                            get_type(key.to_string(), val, &mut sub_map, collection_names);
+                            sub_map.insert("array".to_string(), Value::String("[]".to_string()));
+                            get_type(
+                                key.to_string(),
+                                val,
+                                &mut sub_map,
+                                collection_names,
+                                finder_relationships,
+                            );
                             temp_map.insert(key.to_string(), Value::Object(sub_map));
                         }
                     }
                     // temp_map.insert(key.to_string(), Value::String("array".to_string()));
                 }
                 Value::Object(ob) => {
-                    println!("object {:?}", ob);
+                    // println!("object {:?}", ob);
 
                     match ob.get("$oid") {
                         None => {
-                            let m = get_map_schema(ob, schema, collection_names);
+                            let m =
+                                get_map_schema(ob, schema, collection_names, finder_relationships);
                             temp_map.insert(key.to_string(), Value::Object(m));
                         }
                         Some(_) => {
                             let mut sub_map = Map::new();
                             sub_map.insert("$oid".to_string(), Value::String("string".to_string()));
-                            if key != "_id" {
-                                let plural_key = pluralize(key.as_str(), 2, false);
-                                println!("pluralize {} -> {}", key, plural_key);
-                                if collection_names.contains(&plural_key) {
-                                    sub_map.insert(
-                                        "$collection".to_string(),
-                                        Value::String(plural_key),
-                                    );
+                            match finder_relationships(key, collection_names) {
+                                Some(val) => {
+                                    sub_map.insert("collection".to_string(), Value::String(val));
                                 }
+                                None => {}
                             }
                             temp_map.insert(key.to_string(), Value::Object(sub_map));
                         }
@@ -218,9 +225,7 @@ pub fn get_map_schema(
 pub async fn explore<'a>(
     client: &Client,
     name_db: &str,
-    // finder_relationships: Box<
-    //     dyn Fn(String, &Map<String, Value>, &mut Map<String, Value>, &Vec<String>) -> (),
-    // >,
+    finder_relationships: &FinderRelationships,
 ) -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn Error>> {
     // let client = connect().await?;
     // for db_name in client.list_database_names(None, None).await? {
@@ -252,7 +257,12 @@ pub async fn explore<'a>(
         // Iterate over the results of the cursor.
         while let Some(document) = cursor.try_next().await? {
             // println!("document: {:#?}", document);
-            get_schema(document, &mut col.schema, &collection_names);
+            get_schema(
+                document,
+                &mut col.schema,
+                &collection_names,
+                finder_relationships,
+            );
         }
 
         collection_map.push(col);
@@ -269,7 +279,9 @@ mod tests {
     #[tokio::test]
     async fn explore_db() {
         let client = connect().await.expect("error connect mongodb");
-        let _ = explore(&client, DBV1).await.expect("fail explore");
+        let _ = explore(&client, DBV1, &explore_object_id)
+            .await
+            .expect("fail explore");
         assert_eq!(1, 1);
     }
 }
