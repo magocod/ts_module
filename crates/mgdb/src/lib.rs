@@ -1,5 +1,6 @@
 pub mod db;
 pub mod db_common;
+pub mod db_v2;
 pub mod populate_v1;
 pub mod populate_v2;
 pub mod populate_v3;

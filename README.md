@@ -85,6 +85,9 @@ npm run lint
 
 ```bash
 npm run format:check
+```
+
+```bash
 npm run format
 ```
 
