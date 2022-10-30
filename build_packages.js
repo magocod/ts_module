@@ -16,6 +16,10 @@ function compileWasm(packageName) {
   shell.exec("wasm-pack build --target nodejs");
 }
 
+/**
+ *
+ * @param {string} packageName
+ */
 function compileNeon(packageName) {
   shell.cd("crates/" + packageName);
   // shell.echo("build package");
@@ -23,6 +27,10 @@ function compileNeon(packageName) {
   shell.exec("npm run build");
 }
 
+/**
+ *
+ * @param {string} packageName
+ */
 function compileNapi(packageName) {
   shell.cd("crates/" + packageName);
   // shell.echo("build package");
