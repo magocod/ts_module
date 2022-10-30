@@ -1,4 +1,4 @@
-use mongodb::{options::ClientOptions, Client};
+use mongodb::{options::ClientOptions, Client, Database};
 use std::error::Error;
 
 use futures::stream::TryStreamExt;
@@ -22,8 +22,8 @@ use serde_json::{Map, Value};
 
 pub type GenericDocument = Map<String, Value>;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MongoCollection<T> {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MongodbCollection<T> {
     pub name: String,
     pub docs: Vec<T>,
     pub schema: GenericDocument,
@@ -222,22 +222,21 @@ pub fn get_map_schema(
     temp_map
 }
 
-pub async fn explore<'a>(
-    client: &Client,
-    name_db: &str,
+pub async fn explore(
+    db: &Database,
     finder_relationships: &FinderRelationships,
-) -> Result<Vec<MongoCollection<GenericDocument>>, Box<dyn Error>> {
+) -> Result<Vec<MongodbCollection<GenericDocument>>, Box<dyn Error>> {
     // let client = connect().await?;
     // for db_name in client.list_database_names(None, None).await? {
     //     println!("{}", db_name);
     // }
 
     // Get a handle to a database.
-    let db = client.database(name_db);
+    // let db = client.database(name_db);
 
     let collection_names = db.list_collection_names(None).await?;
 
-    let mut collection_map: Vec<MongoCollection<GenericDocument>> = vec![];
+    let mut collection_map: Vec<MongodbCollection<GenericDocument>> = vec![];
 
     // List the names of the collections in that database.
     for collection_name in collection_names.clone() {
@@ -248,7 +247,7 @@ pub async fn explore<'a>(
         let find_options = FindOptions::builder().limit(1).build();
         let mut cursor = collection.find(None, find_options).await?;
 
-        let mut col = MongoCollection::<GenericDocument> {
+        let mut col = MongodbCollection::<GenericDocument> {
             name: collection_name,
             docs: vec![],
             schema: Map::new(),
@@ -275,13 +274,22 @@ pub async fn explore<'a>(
 mod tests {
     use super::*;
     use crate::db_common::DBV1;
+    use crate::populate_v1::seed as seed_v1;
 
     #[tokio::test]
     async fn explore_db() {
+        seed_v1().await.expect("fail seed"); // FIXME testing data
         let client = connect().await.expect("error connect mongodb");
-        let _ = explore(&client, DBV1, &explore_object_id)
+        let db = client.database(DBV1);
+        let collection_names = db
+            .list_collection_names(None)
+            .await
+            .expect("fail get collections");
+
+        let v = explore(&db, &explore_object_id)
             .await
             .expect("fail explore");
-        assert_eq!(1, 1);
+
+        assert_eq!(v.len(), collection_names.len());
     }
 }

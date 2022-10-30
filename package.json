@@ -1,7 +1,7 @@
 {
   "name": "ts_module",
-  "version": "0.0.2",
-  "description": "example git submodule, typescript",
+  "version": "0.0.3",
+  "description": "example git submodule, typescript, wasm, rust",
   "scripts": {
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
