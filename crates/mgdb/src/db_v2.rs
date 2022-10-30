@@ -242,9 +242,11 @@ mod tests {
     use super::*;
     use crate::db::connect;
     use crate::db_common::DBV1;
+    use crate::populate_v1::seed as seed_v1;
 
     #[tokio::test]
     async fn explorer_explore_db_schema() {
+        seed_v1().await.expect("fail seed"); // FIXME testing data
         let client = connect().await.expect("error connect mongodb");
         let db = client.database(DBV1);
         let collection_names = db

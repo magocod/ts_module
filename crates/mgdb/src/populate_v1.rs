@@ -204,3 +204,24 @@ pub async fn seed() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::connect;
+    use crate::db_common::DBV1;
+
+    #[tokio::test]
+    async fn explorer_explore_db_schema() {
+        let client = connect().await.expect("error connect mongodb");
+        let db = client.database(DBV1);
+        let collection_names = db
+            .list_collection_names(None)
+            .await
+            .expect("fail get collections");
+
+        seed().await.expect("fail seed");
+
+        assert_eq!(collection_names.len(), 6);
+    }
+}
