@@ -10,7 +10,7 @@ import moment from "moment";
 import { promises as fsPromise } from "fs";
 
 export class Explorer {
-  public mongoCollections: MongoCollection[] = [];
+  private mongoCollections: MongoCollection[] = [];
   private collections: Collection[] = [];
 
   constructor(
@@ -102,5 +102,12 @@ export class Explorer {
       `./tmp/${this.db.databaseName}_ts_v2.json`,
       JSON.stringify(this.mongoCollections, null, 2)
     );
+  }
+
+  cache() {
+    return {
+      mongoCollections: this.mongoCollections,
+      collections: this.collections,
+    };
   }
 }
