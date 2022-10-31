@@ -182,7 +182,10 @@ impl<'a> Explorer<'a> {
         temp_map
     }
 
-    pub async fn explore(&mut self, db: &Database) -> Result<&Vec<MongodbCollection<GenericDocument>>, Box<dyn Error>> {
+    pub async fn explore(
+        &mut self,
+        db: &Database,
+    ) -> Result<&Vec<MongodbCollection<GenericDocument>>, Box<dyn Error>> {
         self.collection_names = db.list_collection_names(None).await?;
 
         let mut collection_map: Vec<MongodbCollection<GenericDocument>> = vec![];
@@ -255,10 +258,10 @@ mod tests {
             .expect("fail get collections");
         let collection_len = collection_names.len();
 
-
         let mut explorer = Explorer::new(None);
 
-        let v = explorer.explore(&client.database(DBV1))
+        let v = explorer
+            .explore(&client.database(DBV1))
             .await
             .expect("fail explore");
         let len = v.len();
