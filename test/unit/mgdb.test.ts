@@ -90,6 +90,7 @@ describe("mgdb", function () {
     it("explore dbv0", async function () {
       const explorer = new Explorer(client.db(DbNames.dbv0));
       const v = await explorer.explore();
+      const cache = explorer.cache();
       // console.log(JSON.stringify(v, null, 2));
       // await explorer.saveFile();
 
@@ -99,6 +100,8 @@ describe("mgdb", function () {
           return collectionNames.includes(col.name as CollectionNames);
         })
       ).toEqual(true);
+      expect(cache.collections.length).toEqual(collectionNames.length);
+      expect(cache.mongoCollections.length).toEqual(collectionNames.length);
     });
   });
 
