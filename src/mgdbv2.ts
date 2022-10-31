@@ -107,7 +107,7 @@ export class Explorer {
   cache() {
     return {
       mongoCollections: this.mongoCollections,
-      collections: this.collections
-    }
+      collections: this.collections,
+    };
   }
 }
