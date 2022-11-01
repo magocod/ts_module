@@ -24,6 +24,7 @@ describe("mgdb", function () {
 
   describe("v1", function () {
     it("explore dbv0", async function () {
+      await seed(client.db(DbNames.dbv0));
       const v = await exploreDb(client.db(DbNames.dbv0));
       // console.log(JSON.stringify(v, null, 2));
       // exploreSchema(v)
@@ -37,6 +38,7 @@ describe("mgdb", function () {
     });
 
     it("explore dbv2", async function () {
+      await seed(client.db(DbNames.dbv2));
       const v = await exploreDb(client.db(DbNames.dbv2), (key, collections) => {
         if (key === "_id") {
           return MongoTypes.ObjectId;
@@ -73,6 +75,7 @@ describe("mgdb", function () {
     });
 
     it("explore dbv3", async function () {
+      await seed(client.db(DbNames.dbv3));
       const v = await exploreDb(client.db(DbNames.dbv3));
       // console.log(JSON.stringify(v, null, 2));
       // exploreSchema(v)
@@ -88,6 +91,7 @@ describe("mgdb", function () {
 
   describe("v2", function () {
     it("explore dbv0", async function () {
+      await seed(client.db(DbNames.dbv0));
       const explorer = new Explorer(client.db(DbNames.dbv0));
       const v = await explorer.explore();
       const cache = explorer.cache();
