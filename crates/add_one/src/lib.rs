@@ -1,4 +1,5 @@
-pub mod day_1;
+pub mod day1m;
+pub mod day1a;
 
 pub fn add_one(x: i32) -> i32 {
     x + 1

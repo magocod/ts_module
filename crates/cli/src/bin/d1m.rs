@@ -1,4 +1,4 @@
-use add_one::day_1::{pretty_print, transpose};
+use add_one::day1m::{pretty_print, transpose};
 
 fn main() {
     let matrix = [
