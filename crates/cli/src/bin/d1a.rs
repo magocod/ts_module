@@ -14,8 +14,8 @@ fn main() {
     library.print_books();
 
     match library.oldest_book() {
-       Some(book) => println!("My oldest book is {book}"),
-       None => println!("My library is empty!"),
+        Some(book) => println!("My oldest book is {book}"),
+        None => println!("My library is empty!"),
     }
 
     println!("Our library has {} books", library.len());
