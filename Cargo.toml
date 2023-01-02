@@ -8,6 +8,7 @@ members = [
     "crates/adder",
     "crates/appw",
     "crates/calculator-napi",
+    "crates/cli",
     "crates/appr",
     "crates/mgdb"
 ]
