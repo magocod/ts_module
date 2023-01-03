@@ -1,4 +1,4 @@
-use add_one::day3a::{DirectoryIterator};
+use add_one::day3a::DirectoryIterator;
 
 fn main() -> Result<(), String> {
     let iter = DirectoryIterator::new(".")?;

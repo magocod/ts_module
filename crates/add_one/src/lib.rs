@@ -2,9 +2,9 @@ pub mod day1a;
 pub mod day1m;
 pub mod day2a;
 pub mod day2m;
-pub mod day3m;
 #[cfg(target_os = "linux")]
 pub mod day3a;
+pub mod day3m;
 
 pub fn add_one(x: i32) -> i32 {
     x + 1
