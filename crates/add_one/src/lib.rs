@@ -5,6 +5,7 @@ pub mod day2m;
 #[cfg(target_os = "linux")]
 pub mod day3a;
 pub mod day3m;
+pub mod day4m;
 
 pub fn add_one(x: i32) -> i32 {
     x + 1
