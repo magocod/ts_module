@@ -26,8 +26,8 @@ impl Philosopher {
     pub fn eat(&self) {
         // ANCHOR_END: Philosopher-eat
         println!("{} is trying to eat", &self.name);
-        let _ = self.left_fork.lock().unwrap();
-        let _ = self.right_fork.lock().unwrap();
+        let _unused_left = self.left_fork.lock().unwrap();
+        let _unused_right = self.right_fork.lock().unwrap();
 
         // ANCHOR: Philosopher-eat-end
         println!("{} is eating...", &self.name);
