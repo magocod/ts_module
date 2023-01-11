@@ -10,5 +10,6 @@ members = [
     "crates/calculator-napi",
     "crates/cli",
     "crates/appr",
-    "crates/mgdb"
+    "crates/mgdb",
+    "crates/link-checker"
 ]
