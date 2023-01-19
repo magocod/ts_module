@@ -11,5 +11,7 @@ members = [
     "crates/cli",
     "crates/appr",
     "crates/mgdb",
-    "crates/link-checker"
+    "crates/link-checker",
+    "crates/benche",
+    "crates/benche-criterion"
 ]
