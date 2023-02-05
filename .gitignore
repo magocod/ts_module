@@ -13,3 +13,6 @@ test/coverage
 
 # rust
 /target
+
+# cpp
+cmake-build-debug
