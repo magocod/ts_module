@@ -105,8 +105,6 @@ export async function seed(db: Db) {
     date: new Date(),
   });
 
-  const d = userCol.find()
-
   const tokenCol = db.collection<Token>(CollectionNames.Tokens);
   await tokenCol.insertOne({
     token: faker.datatype.uuid(),
